@@ -30,27 +30,35 @@ stages:
 base:
     stage: base
     before_script:
-        - export IMAGE="${CI_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/base"
+        # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
+        - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
+        - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/base"
         - export OCI_YML=base.yml
     <<: *build
 
 gnome:master:
     stage: runtimes
     before_script:
-        - export IMAGE="${CI_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/gnome:master"
+        # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
+        - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
+        - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/gnome:master"
         - export OCI_YML=gnome-master/Dockerfile
     <<: *build
 
 gnome:3.26:
     stage: runtimes
     before_script:
-        - export IMAGE="${CI_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/gnome:3.26"
+        # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
+        - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
+        - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/gnome:3.26"
         - export OCI_YML=gnome-3-26/Dockerfile
     <<: *build
 
 gnome:3.28:
     stage: runtimes
     before_script:
-        - export IMAGE="${CI_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/gnome:3.28"
+        # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
+        - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
+        - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/gnome:3.28"
         - export OCI_YML=gnome-3-28/Dockerfile
     <<: *build
