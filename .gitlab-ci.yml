@@ -34,4 +34,23 @@ base:
         - export OCI_YML=base.yml
     <<: *build
 
+gnome:master:
+    stage: runtimes
+    before_script:
+        - export IMAGE="${CI_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/gnome:master"
+        - export OCI_YML=gnome-master/Dockerfile
+    <<: *base_build
 
+gnome:3.26:
+    stage: runtimes
+    before_script:
+        - export IMAGE="${CI_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/gnome:3.26"
+        - export OCI_YML=gnome-3-26/Dockerfile
+    <<: *base_build
+
+gnome:3.28:
+    stage: runtimes
+    before_script:
+        - export IMAGE="${CI_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/gnome:3.28"
+        - export OCI_YML=gnome-3-28/Dockerfile
+    <<: *base_build
