@@ -26,6 +26,7 @@ stages:
         - master
         - triggers
         - schedules
+    retry: 1
 
 base:
     stage: base
