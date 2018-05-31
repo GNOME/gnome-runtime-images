@@ -6,9 +6,7 @@
          xmlns="http://usefulinc.com/ns/doap#">
 
   <name xml:lang="en">gnome-runtime-images</name>
-  <shortdesc xml:lang="en">
-    GNOME Nightly runtime container images 
-  </shortdesc>
+  <shortdesc xml:lang="en">GNOME runtime container images</shortdesc>
   <description xml:lang="en">Pre built container images of the GNOME runtime to be used for building and testing Flatpaks in the CI.</description>
   <bug-database rdf:resource="https://gitlab.gnome.org/GNOME/gnome-runtime-images/issues" />
   <maintainer>
