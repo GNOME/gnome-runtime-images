@@ -9,11 +9,7 @@
   <shortdesc xml:lang="en">
     GNOME Nightly runtime container images 
   </shortdesc>
-  <description xml:lang="en">
-    <p>
-      Pre built container images of the GNOME runtime to be used for building and testing Flatpaks in the CI.
-    </p>
-  </description>
+  <description xml:lang="en">Pre built container images of the GNOME runtime to be used for building and testing Flatpaks in the CI.</description>
   <bug-database rdf:resource="https://gitlab.gnome.org/GNOME/gnome-runtime-images/issues" />
   <maintainer>
     <foaf:Person>
