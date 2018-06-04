@@ -1,0 +1,3 @@
+FROM @BASE_IMAGE@
+
+RUN flatpak install flathub org.freedesktop.Sdk.Extension.rust-stable
