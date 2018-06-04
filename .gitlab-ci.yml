@@ -71,7 +71,7 @@ rust:master:
         # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
         - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
         - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/rust_bundle:master"
-        - export OCI_YML=-sdk-bundles/rust.yml
+        - export OCI_YML="sdk-bundles/rust.yml"
 
         - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:master"
         - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust.yml
@@ -83,7 +83,7 @@ rust:3.28:
         # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
         - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
         - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/rust_bundle:3.28"
-        - export OCI_YML=-sdk-bundles/rust.yml
+        - export OCI_YML="sdk-bundles/rust.yml"
 
         - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:3.28"
         - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust.yml
