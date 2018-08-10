@@ -74,11 +74,9 @@ rust master:
         - export OCI_YML="sdk-bundles/rust.yml"
 
         - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:master"
-        - export REPO="fdo-unstable"
         - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust.yml
-        - sed -i "s|@REPO@|$REPO|" sdk-bundles/rust.yml
         # specify the branch
-        - echo -n "//unstable" >> sdk-bundles/rust.yml
+        - echo -n "//18.08" >> sdk-bundles/rust.yml
     <<: *build
 
 rust 3.28:
@@ -90,7 +88,7 @@ rust 3.28:
         - export OCI_YML="sdk-bundles/rust.yml"
 
         - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:3.28"
-        - export REPO="flathub"
         - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust.yml
-        - sed -i "s|@REPO@|$REPO|" sdk-bundles/rust.yml
+        # specify the branch
+        - echo -n "//1.6" >> sdk-bundles/rust.yml
     <<: *build
