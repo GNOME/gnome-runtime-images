@@ -65,6 +65,15 @@ gnome:3.28:
         - export OCI_YML=gnome-3-28/Dockerfile
     <<: *build
 
+gnome:3.30:
+    stage: runtimes
+    before_script:
+        # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
+        - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
+        - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/gnome:3.30"
+        - export OCI_YML=gnome-3-30/Dockerfile
+    <<: *build
+
 rust master:
     stage: rust_bundle
     before_script:
