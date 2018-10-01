@@ -101,3 +101,17 @@ rust 3.28:
         # specify the branch
         - echo -n "//1.6" >> sdk-bundles/rust.yml
     <<: *build
+
+rust 3.30:
+    stage: rust_bundle
+    before_script:
+        # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
+        - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
+        - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/rust_bundle:3.30"
+        - export OCI_YML="sdk-bundles/rust.yml"
+
+        - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:3.30"
+        - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust.yml
+        # specify the branch
+        - echo -n "//18.08" >> sdk-bundles/rust.yml
+    <<: *build
