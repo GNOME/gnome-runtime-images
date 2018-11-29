@@ -11,7 +11,7 @@ RUN dnf -y update && \
 
 RUN flatpak remote-add flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 RUN flatpak remote-add gnome-nightly https://sdk.gnome.org/gnome-nightly.flatpakrepo
-RUN flatpak remote-add fdo-unstable https://cache.sdk.freedesktop.org/freedesktop-sdk.flatpakrepo
+# RUN flatpak remote-add freedesktop-staging https://cache.sdk.freedesktop.org/freedesktop-sdk.flatpakrepo
 
 # Add a machine-id as specified in the freedesktop spec:
 # https://www.freedesktop.org/software/systemd/man/machine-id.html
