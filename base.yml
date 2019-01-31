@@ -10,7 +10,7 @@ RUN dnf -y update && \
     dnf clean all
 
 # Temporary pin flatpak-builder
-RUN wget 'https://kojipkgs.fedoraproject.org//packages/flatpak-builder/1.0.2/1.fc29/x86_64/flatpak-builder-1.0.2-1.fc29.x86_64.rpm' && \
+RUN curl -o flatpak-builder-1.0.2-1.fc29.x86_64.rpm 'https://kojipkgs.fedoraproject.org//packages/flatpak-builder/1.0.2/1.fc29/x86_64/flatpak-builder-1.0.2-1.fc29.x86_64.rpm' && \
     dnf install -y flatpak-builder-1.0.2-1.fc29.x86_64.rpm
 
 RUN flatpak remote-add flathub https://dl.flathub.org/repo/flathub.flatpakrepo
