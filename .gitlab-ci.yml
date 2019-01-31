@@ -23,6 +23,8 @@ stages:
         - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
         - docker build --pull -f ${OCI_YML} -t ${IMAGE} .
         - docker push ${IMAGE}
+    tags:
+        - 'packet'
     only:
         - master
         - triggers
