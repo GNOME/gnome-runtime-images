@@ -13,8 +13,8 @@ RUN curl -o flatpak-builder-1.0.2-1.fc29.x86_64.rpm 'https://kojipkgs.fedoraproj
     dnf install -y flatpak-builder-1.0.2-1.fc29.x86_64.rpm && \
     dnf clean all
 
-RUN flatpak remote-add flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-RUN flatpak remote-add gnome-nightly https://sdk.gnome.org/gnome-nightly.flatpakrepo
+RUN flatpak remote-add flathub https://dl.flathub.org/repo/flathub.flatpakrepo && \
+    flatpak remote-add gnome-nightly https://sdk.gnome.org/gnome-nightly.flatpakrepo
 # RUN flatpak remote-add freedesktop-staging https://cache.sdk.freedesktop.org/freedesktop-sdk.flatpakrepo
 
 # Add a machine-id as specified in the freedesktop spec:
