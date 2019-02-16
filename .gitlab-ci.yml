@@ -13,15 +13,15 @@ stages:
     - rust_bundle
 
 # Expects $IMAGE which should be the name+tag of the registry image.
-# Expects $OCI_YML variable which should be the path to the dockerfile
+# Expects $DOCKERFILE variable which should be the path to the dockerfile
 .build_emplate: &build
     script:
         # For debugging
-        - echo ${OCI_YML}
+        - echo ${DOCKERFILE}
         - echo ${IMAGE}
 
         - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-        - docker build --pull -f ${OCI_YML} -t ${IMAGE} .
+        - docker build --pull -f ${DOCKERFILE} -t ${IMAGE} .
         - docker push ${IMAGE}
     tags:
         - 'packet'
@@ -37,7 +37,7 @@ base:
         # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
         - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
         - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/base"
-        - export OCI_YML=base.yml
+        - export DOCKERFILE=base
     <<: *build
 
 gnome:master:
@@ -46,7 +46,7 @@ gnome:master:
         # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
         - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
         - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/gnome:master"
-        - export OCI_YML=gnome-master/Dockerfile
+        - export DOCKERFILE=gnome-master/Dockerfile
     <<: *build
 
 gnome:3.26:
@@ -55,7 +55,7 @@ gnome:3.26:
         # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
         - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
         - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/gnome:3.26"
-        - export OCI_YML=gnome-3-26/Dockerfile
+        - export DOCKERFILE=gnome-3-26/Dockerfile
     <<: *build
 
 gnome:3.28:
@@ -64,7 +64,7 @@ gnome:3.28:
         # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
         - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
         - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/gnome:3.28"
-        - export OCI_YML=gnome-3-28/Dockerfile
+        - export DOCKERFILE=gnome-3-28/Dockerfile
     <<: *build
 
 gnome:3.30:
@@ -73,7 +73,7 @@ gnome:3.30:
         # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
         - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
         - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/gnome:3.30"
-        - export OCI_YML=gnome-3-30/Dockerfile
+        - export DOCKERFILE=gnome-3-30/Dockerfile
     <<: *build
 
 rust master:
@@ -82,12 +82,12 @@ rust master:
         # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
         - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
         - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/rust_bundle:master"
-        - export OCI_YML="sdk-bundles/rust.yml"
+        - export DOCKERFILE="sdk-bundles/rust"
 
         - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:master"
-        - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust.yml
+        - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust
         # specify the branch
-        - echo -n "//18.08" >> sdk-bundles/rust.yml
+        - echo -n "//18.08" >> sdk-bundles/rust
     <<: *build
 
 rust 3.28:
@@ -96,12 +96,12 @@ rust 3.28:
         # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
         - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
         - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/rust_bundle:3.28"
-        - export OCI_YML="sdk-bundles/rust.yml"
+        - export DOCKERFILE="sdk-bundles/rust"
 
         - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:3.28"
-        - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust.yml
+        - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust
         # specify the branch
-        - echo -n "//1.6" >> sdk-bundles/rust.yml
+        - echo -n "//1.6" >> sdk-bundles/rust
     <<: *build
 
 rust 3.30:
@@ -110,10 +110,10 @@ rust 3.30:
         # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
         - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
         - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/rust_bundle:3.30"
-        - export OCI_YML="sdk-bundles/rust.yml"
+        - export DOCKERFILE="sdk-bundles/rust"
 
         - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:3.30"
-        - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust.yml
+        - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust
         # specify the branch
-        - echo -n "//18.08" >> sdk-bundles/rust.yml
+        - echo -n "//18.08" >> sdk-bundles/rust
     <<: *build
