@@ -34,54 +34,42 @@ stages:
 base:
     stage: base
     before_script:
-        # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
-        - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
-        - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/base"
+        - export IMAGE="${CI_REGISTRY_IMAGE}/base"
         - export DOCKERFILE=base
     <<: *build
 
 gnome:master:
     stage: runtimes
     before_script:
-        # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
-        - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
-        - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/gnome:master"
+        - export IMAGE="${CI_REGISTRY_IMAGE}/gnome:master"
         - export DOCKERFILE=gnome-master/Dockerfile
     <<: *build
 
 gnome:3.26:
     stage: runtimes
     before_script:
-        # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
-        - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
-        - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/gnome:3.26"
+        - export IMAGE="${CI_REGISTRY_IMAGE}/gnome:3.26"
         - export DOCKERFILE=gnome-3-26/Dockerfile
     <<: *build
 
 gnome:3.28:
     stage: runtimes
     before_script:
-        # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
-        - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
-        - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/gnome:3.28"
+        - export IMAGE="${CI_REGISTRY_IMAGE}/gnome:3.28"
         - export DOCKERFILE=gnome-3-28/Dockerfile
     <<: *build
 
 gnome:3.30:
     stage: runtimes
     before_script:
-        # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
-        - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
-        - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/gnome:3.30"
+        - export IMAGE="${CI_REGISTRY_IMAGE}/gnome:3.30"
         - export DOCKERFILE=gnome-3-30/Dockerfile
     <<: *build
 
 rust master:
     stage: rust_bundle
     before_script:
-        # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
-        - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
-        - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/rust_bundle:master"
+        - export IMAGE="${CI_REGISTRY_IMAGE}/rust_bundle:master"
         - export DOCKERFILE="sdk-bundles/rust"
 
         - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:master"
@@ -93,9 +81,7 @@ rust master:
 rust 3.28:
     stage: rust_bundle
     before_script:
-        # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
-        - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
-        - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/rust_bundle:3.28"
+        - export IMAGE="${CI_REGISTRY_IMAGE}/rust_bundle:3.28"
         - export DOCKERFILE="sdk-bundles/rust"
 
         - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:3.28"
@@ -107,9 +93,7 @@ rust 3.28:
 rust 3.30:
     stage: rust_bundle
     before_script:
-        # https://stackoverflow.com/questions/2264428/converting-string-to-lower-case-in-bash#2264537
-        - export NAMESPACE="$(echo "${CI_PROJECT_NAMESPACE}" | tr A-Z a-z)"
-        - export IMAGE="${CI_REGISTRY}/${NAMESPACE}/${CI_PROJECT_NAME}/rust_bundle:3.30"
+        - export IMAGE="${CI_REGISTRY_IMAGE}/rust_bundle:3.30"
         - export DOCKERFILE="sdk-bundles/rust"
 
         - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:3.30"
