@@ -23,6 +23,8 @@ stages:
         - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
         - docker build --pull -f ${DOCKERFILE} -t ${IMAGE} .
         - docker push ${IMAGE}
+    after_script:
+        - docker run --rm ${IMAGE} flatpak list --columns=application,branch,arch,active,size
     tags:
         - 'packet'
     only:
