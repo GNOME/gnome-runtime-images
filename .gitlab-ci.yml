@@ -12,21 +12,20 @@ stages:
     - runtimes
     - rust_bundle
 
-# Expects $IMAGE which should be the name+tag of the registry image.
-# Expects $DOCKERFILE variable which should be the path to the dockerfile
-.build_emplate: &build
+# Expects ${DOCKERIMAGE} which should be the name+tag of the registry image.
+# Expects ${DOCKERFILE} variable which should be the path to the Dockerfile.
+.build_template:
     script:
         # For debugging
-        - echo ${DOCKERFILE}
-        - echo ${IMAGE}
-
-        - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-        - docker build --pull -f ${DOCKERFILE} -t ${IMAGE} .
-        - docker push ${IMAGE}
+        - echo ${DOCKERFILE} / ${DOCKERIMAGE}
+        - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+        - docker build --pull -f ${DOCKERFILE} -t ${DOCKERIMAGE} .
+        - docker push ${DOCKERIMAGE}
     after_script:
-        - docker run --rm ${IMAGE} flatpak list --columns=application,branch,arch,active,size
+        - docker run --rm ${DOCKERIMAGE} flatpak list --columns=application,branch,arch,active,size
+        - docker image inspect --format "{{json .Id}}" ${DOCKERIMAGE}
     tags:
-        - 'packet'
+        - packet
     only:
         - master
         - triggers
@@ -35,71 +34,71 @@ stages:
 
 base:
     stage: base
-    before_script:
-        - export IMAGE="${CI_REGISTRY_IMAGE}/base"
-        - export DOCKERFILE=base
-    <<: *build
+    extends: .build_template
+    variables:
+        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/base
+        DOCKERFILE: base
 
 gnome:master:
     stage: runtimes
-    before_script:
-        - export IMAGE="${CI_REGISTRY_IMAGE}/gnome:master"
-        - export DOCKERFILE=gnome-master/Dockerfile
-    <<: *build
+    extends: .build_template
+    variables:
+        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/gnome:master
+        DOCKERFILE: gnome-master/Dockerfile
 
 gnome:3.26:
     stage: runtimes
-    before_script:
-        - export IMAGE="${CI_REGISTRY_IMAGE}/gnome:3.26"
-        - export DOCKERFILE=gnome-3-26/Dockerfile
-    <<: *build
+    extends: .build_template
+    variables:
+        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/gnome:3.26
+        DOCKERFILE: gnome-3-26/Dockerfile
 
 gnome:3.28:
     stage: runtimes
-    before_script:
-        - export IMAGE="${CI_REGISTRY_IMAGE}/gnome:3.28"
-        - export DOCKERFILE=gnome-3-28/Dockerfile
-    <<: *build
+    extends: .build_template
+    variables:
+        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/gnome:3.28
+        DOCKERFILE: gnome-3-28/Dockerfile
 
 gnome:3.30:
     stage: runtimes
-    before_script:
-        - export IMAGE="${CI_REGISTRY_IMAGE}/gnome:3.30"
-        - export DOCKERFILE=gnome-3-30/Dockerfile
-    <<: *build
+    extends: .build_template
+    variables:
+        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/gnome:3.30
+        DOCKERFILE: gnome-3-30/Dockerfile
 
 rust master:
     stage: rust_bundle
+    extends: .build_template
     before_script:
-        - export IMAGE="${CI_REGISTRY_IMAGE}/rust_bundle:master"
-        - export DOCKERFILE="sdk-bundles/rust"
-
         - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:master"
         - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust
         # specify the branch
         - echo -n "//18.08" >> sdk-bundles/rust
-    <<: *build
+    variables:
+        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/rust_bundle:master
+        DOCKERFILE: sdk-bundles/rust
 
 rust 3.28:
     stage: rust_bundle
+    extends: .build_template
     before_script:
-        - export IMAGE="${CI_REGISTRY_IMAGE}/rust_bundle:3.28"
-        - export DOCKERFILE="sdk-bundles/rust"
-
         - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:3.28"
         - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust
         # specify the branch
         - echo -n "//1.6" >> sdk-bundles/rust
-    <<: *build
+    variables:
+        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/rust_bundle:3.28
+        DOCKERFILE: sdk-bundles/rust
 
 rust 3.30:
     stage: rust_bundle
+    extends: .build_template
     before_script:
-        - export IMAGE="${CI_REGISTRY_IMAGE}/rust_bundle:3.30"
-        - export DOCKERFILE="sdk-bundles/rust"
-
         - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:3.30"
         - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust
         # specify the branch
         - echo -n "//18.08" >> sdk-bundles/rust
-    <<: *build
+    variables:
+        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/rust_bundle:3.30
+        DOCKERFILE: sdk-bundles/rust
