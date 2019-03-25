@@ -24,8 +24,6 @@ stages:
     after_script:
         - docker run --rm ${DOCKERIMAGE} flatpak list --columns=application,branch,arch,active,size
         - docker image inspect --format "{{json .Id}}" ${DOCKERIMAGE}
-    tags:
-        - packet
     only:
         - master
         - triggers
