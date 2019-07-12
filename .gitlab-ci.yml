@@ -77,9 +77,11 @@ rust master:
     extends: .build_template
     before_script:
         - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:master"
+        - export REPO="flathub_beta"
         - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust
+        - sed -i "s|@REPO@|$REPO|" sdk-bundles/rust
         # specify the branch
-        - echo -n "//18.08" >> sdk-bundles/rust
+        - echo -n "//19.08beta" >> sdk-bundles/rust
     variables:
         DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/rust_bundle:master
         DOCKERFILE: sdk-bundles/rust
@@ -89,7 +91,9 @@ rust 3.28:
     extends: .build_template
     before_script:
         - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:3.28"
+        - export REPO="flathub"
         - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust
+        - sed -i "s|@REPO@|$REPO|" sdk-bundles/rust
         # specify the branch
         - echo -n "//1.6" >> sdk-bundles/rust
     variables:
@@ -101,7 +105,9 @@ rust 3.30:
     extends: .build_template
     before_script:
         - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:3.30"
+        - export REPO="flathub"
         - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust
+        - sed -i "s|@REPO@|$REPO|" sdk-bundles/rust
         # specify the branch
         - echo -n "//18.08" >> sdk-bundles/rust
     variables:
@@ -113,7 +119,9 @@ rust 3.32:
     extends: .build_template
     before_script:
         - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:3.32"
+        - export REPO="flathub"
         - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust
+        - sed -i "s|@REPO@|$REPO|" sdk-bundles/rust
         # specify the branch
         - echo -n "//18.08" >> sdk-bundles/rust
     variables:
