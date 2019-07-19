@@ -41,7 +41,7 @@ flat-manager-client:
     stage: base
     extends: .build_template
     variables:
-        DOCKERFILE: ${CI_REGISTRY_IMAGE}/flat-manager-client
+        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/flat-manager-client
         DOCKERFILE: flat-manager-client/Dockerfile
 
 gnome:master:
