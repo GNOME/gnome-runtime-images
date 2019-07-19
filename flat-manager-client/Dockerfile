@@ -4,7 +4,7 @@ VOLUME /build
 WORKDIR /build
 
 RUN dnf -y update && \
-    dnf install -y flatpak python3-gobject python3-requests ostree-libs && \
+    dnf install -y flatpak python3-gobject python3-requests ostree ostree-libs && \
     dnf clean all
 
 RUN curl -o /usr/bin/flat-manager-client \
