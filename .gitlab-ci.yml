@@ -1,11 +1,8 @@
-image: docker:latest
-services:
-    - docker:dind
+image: 'registry.fedoraproject.org/fedora:30'
 
-# When using dind, it's wise to use the overlayfs driver for
-# improved performance.
+# Buildah can't use 'overlay' driver when running inside docker
 variables:
-    DOCKER_DRIVER: overlay2
+    STORAGE_DRIVER: vfs
 
 stages:
     - base
@@ -18,12 +15,19 @@ stages:
     script:
         # For debugging
         - echo ${DOCKERFILE} / ${DOCKERIMAGE}
-        - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
-        - docker build --pull -f ${DOCKERFILE} -t ${DOCKERIMAGE} .
-        - docker push ${DOCKERIMAGE}
+        - dnf install -y buildah podman
+        - buildah login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+        - buildah bud --pull -f ${DOCKERFILE} -t ${DOCKERIMAGE} .
+        - buildah push ${DOCKERIMAGE}
     after_script:
-        - docker run --rm ${DOCKERIMAGE} flatpak list --columns=application,branch,arch,active,size
-        - docker image inspect --format "{{json .Id}}" ${DOCKERIMAGE}
+        # don't try to use systemd/journald
+        - |
+          cat >> /etc/containers/libpod.conf << END
+          cgroup_manager = "cgroupfs"
+          events_logger = "file"
+          END
+        - podman run --rm ${DOCKERIMAGE} flatpak list --columns=application,branch,arch,active,size
+        - buildah inspect --format "{{.FromImageID}}" ${DOCKERIMAGE}
     only:
         - master
         - triggers
