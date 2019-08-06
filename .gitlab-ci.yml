@@ -55,27 +55,6 @@ gnome:master:
         DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/gnome:master
         DOCKERFILE: gnome-master/Dockerfile
 
-gnome:3.26:
-    stage: runtimes
-    extends: .build_template
-    variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/gnome:3.26
-        DOCKERFILE: gnome-3-26/Dockerfile
-
-gnome:3.28:
-    stage: runtimes
-    extends: .build_template
-    variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/gnome:3.28
-        DOCKERFILE: gnome-3-28/Dockerfile
-
-gnome:3.30:
-    stage: runtimes
-    extends: .build_template
-    variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/gnome:3.30
-        DOCKERFILE: gnome-3-30/Dockerfile
-
 gnome:3.32:
     stage: runtimes
     extends: .build_template
@@ -93,30 +72,6 @@ rust master:
         - sed -i "s|@BRANCH@|$BRANCH|" sdk-bundles/rust
     variables:
         DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/rust_bundle:master
-        DOCKERFILE: sdk-bundles/rust
-
-rust 3.28:
-    stage: rust_bundle
-    extends: .build_template
-    before_script:
-        - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:3.28"
-        - export BRANCH="1.6"
-        - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust
-        - sed -i "s|@BRANCH@|$BRANCH|" sdk-bundles/rust
-    variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/rust_bundle:3.28
-        DOCKERFILE: sdk-bundles/rust
-
-rust 3.30:
-    stage: rust_bundle
-    extends: .build_template
-    before_script:
-        - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:3.30"
-        - export BRANCH="18.08"
-        - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust
-        - sed -i "s|@BRANCH@|$BRANCH|" sdk-bundles/rust
-    variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/rust_bundle:3.30
         DOCKERFILE: sdk-bundles/rust
 
 rust 3.32:
