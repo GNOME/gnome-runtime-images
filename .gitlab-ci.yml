@@ -17,7 +17,7 @@ stages:
         - echo ${DOCKERFILE} / ${DOCKERIMAGE}
         - dnf install -y buildah podman
         - buildah login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
-        - buildah bud --pull -f ${DOCKERFILE} -t ${DOCKERIMAGE} .
+        - buildah bud --format=docker --pull -f ${DOCKERFILE} -t ${DOCKERIMAGE} .
         - buildah push ${DOCKERIMAGE}
     after_script:
         # don't try to use systemd/journald
