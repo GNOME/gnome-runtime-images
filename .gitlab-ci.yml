@@ -13,14 +13,15 @@ stages:
 # Expects ${DOCKERFILE} variable which should be the path to the Dockerfile.
 .build_template:
     script:
-        # Newer versions of podman/buildah try to set overlayfs mount options when
-        # using the vfs driver, and this causes errors.
-        -  sed -i '/^mountopt =.*/d' /etc/containers/storage.conf
-
         # For debugging
         - echo ${DOCKERFILE} / ${DOCKERIMAGE}
         - dnf install -y buildah podman
         - buildah login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+
+        # Newer versions of podman/buildah try to set overlayfs mount options when
+        # using the vfs driver, and this causes errors.
+        - sed -i '/^mountopt =.*/d' /etc/containers/storage.conf
+
         - buildah bud --format=docker --pull -f ${DOCKERFILE} -t ${DOCKERIMAGE} .
         - buildah push ${DOCKERIMAGE}
     after_script:
