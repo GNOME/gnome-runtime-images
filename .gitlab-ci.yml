@@ -27,7 +27,7 @@ stages:
           events_logger = "file"
           END
         - podman run --rm ${DOCKERIMAGE} flatpak list --columns=application,branch,arch,active,size
-        - buildah inspect --format "{{.FromImageID}}" ${DOCKERIMAGE}
+        # - buildah inspect --format "{{.FromImageID}}" ${DOCKERIMAGE}
     only:
         - master
         - triggers
