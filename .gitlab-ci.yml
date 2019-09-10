@@ -72,7 +72,7 @@ rust master:
     extends: .build_template
     before_script:
         - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:master"
-        - export BRANCH="19.08beta"
+        - export BRANCH="19.08"
         - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust
         - sed -i "s|@BRANCH@|$BRANCH|" sdk-bundles/rust
     variables:
