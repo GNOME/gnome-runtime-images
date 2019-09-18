@@ -1,0 +1,1 @@
+Pre built container images of the GNOME runtime to be used for building and testing Flatpaks in the CI.
