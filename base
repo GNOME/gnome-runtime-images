@@ -1,5 +1,17 @@
 FROM registry.fedoraproject.org/fedora:latest
 
+RUN dnf -y update && dnf install -y git 'dnf-command(builddep)' libtool \
+        automake gettext-devel autoconf && \
+    dnf builddep -y flatpak-builder && \
+    dnf groupinstall -y "Development Tools"
+
+RUN git clone --recursive https://github.com/flatpak/flatpak-builder -b run-without-fuse && \
+    cd flatpak-builder && \
+    ./autogen.sh && make -j$(nproc)
+
+FROM registry.fedoraproject.org/fedora:latest
+COPY --from=0 /flatpak-builder/flatpak-builder /usr/local/bin/flatpak-builder
+
 ENV FLATPAK_GL_DRIVERS=dummy
 
 RUN useradd --home-dir /build --create-home --shell /bin/bash build
@@ -11,7 +23,7 @@ WORKDIR /build
 RUN cat /dev/urandom | tr -dc a-f0-9 | head -c32 > /etc/machine-id && echo "" >> /etc/machine-id
 
 RUN dnf -y update && \
-    dnf install -y flatpak flatpak-builder librsvg2 ostree fuse elfutils \
+    dnf install -y flatpak librsvg2 ostree fuse elfutils \
     dconf dbus-daemon git bzr xorg-x11-server-Xvfb dbus-x11 && \
     dnf clean all
 
@@ -20,4 +32,3 @@ USER build
 RUN flatpak remote-add --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo && \
     flatpak remote-add --user gnome-nightly https://nightly.gnome.org/gnome-nightly.flatpakrepo && \
     flatpak remote-add --user flathub-beta https://flathub.org/beta-repo/flathub-beta.flatpakrepo
-
