@@ -23,7 +23,7 @@ WORKDIR /build
 RUN cat /dev/urandom | tr -dc a-f0-9 | head -c32 > /etc/machine-id && echo "" >> /etc/machine-id
 
 RUN dnf -y update && \
-    dnf install -y flatpak librsvg2 ostree fuse elfutils \
+    dnf install -y flatpak librsvg2 ostree fuse elfutils bzip2 \
     dconf dbus-daemon git bzr xorg-x11-server-Xvfb dbus-x11 && \
     dnf clean all
 
