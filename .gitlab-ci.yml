@@ -12,6 +12,8 @@ stages:
 # Expects ${DOCKERIMAGE} which should be the name+tag of the registry image.
 # Expects ${DOCKERFILE} variable which should be the path to the Dockerfile.
 .build_template:
+    tags:
+        - privileged
     script:
         # For debugging
         - echo ${DOCKERFILE} / ${DOCKERIMAGE}
