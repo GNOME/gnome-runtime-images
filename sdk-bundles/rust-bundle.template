@@ -1,3 +1,0 @@
-FROM @BASE_IMAGE@
-
-RUN flatpak install --noninteractive -y org.freedesktop.Sdk.Extension.rust-stable//@BRANCH@

@@ -3,28 +3,33 @@ image: 'registry.fedoraproject.org/fedora:30'
 # Buildah can't use 'overlay' driver when running inside docker
 variables:
     STORAGE_DRIVER: vfs
+    BUILDAH_FORMAT: docker
 
 stages:
     - base
     - runtimes
     - rust_bundle
 
-# Expects ${DOCKERIMAGE} which should be the name+tag of the registry image.
-# Expects ${DOCKERFILE} variable which should be the path to the Dockerfile.
-.build_template:
+default:
     tags:
         - privileged
-    script:
-        # For debugging
-        - echo ${DOCKERFILE} / ${DOCKERIMAGE}
+    before_script:
         - dnf install -y buildah podman
         - buildah login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
 
         # Newer versions of podman/buildah try to set overlayfs mount options when
         # using the vfs driver, and this causes errors.
         - sed -i '/^mountopt =.*/d' /etc/containers/storage.conf
+    retry: 1
 
-        - buildah bud --format=docker --pull -f ${DOCKERFILE} -t ${DOCKERIMAGE} .
+# Expects ${DOCKERIMAGE} which should be the name+tag of the registry image.
+# Expects ${DOCKERFILE} variable which should be the path to the Dockerfile.
+.dockerfile_template:
+    script:
+        # For debugging
+        - echo ${DOCKERFILE} / ${DOCKERIMAGE}
+
+        - buildah bud -f ${DOCKERFILE} -t ${DOCKERIMAGE} .
         - buildah push ${DOCKERIMAGE}
     after_script:
         # don't try to use systemd/journald
@@ -39,94 +44,77 @@ stages:
         - master
         - triggers
         - schedules
-    retry: 1
 
 base:
     stage: base
-    extends: .build_template
+    extends: .dockerfile_template
     variables:
         DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/base
         DOCKERFILE: base
 
 flat-manager-client:
     stage: base
-    extends: .build_template
+    extends: .dockerfile_template
     variables:
         DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/flat-manager-client
         DOCKERFILE: flat-manager-client/Dockerfile
 
+
+# Expects ${BRANCH} and ${FD_BRANCH} variables which are the gnome branch and the freedesktop-sdk
+# branch it is based on
+.sdk_template:
+    script:
+        # build and push the flatpak sdk image
+        - |
+          CONTAINER=$(buildah from ${CI_REGISTRY_IMAGE}/base)
+
+          buildah run $CONTAINER flatpak install --user --noninteractive \
+                    org.gnome.Sdk//${BRANCH} org.gnome.Platform//${BRANCH}
+
+          buildah commit $CONTAINER ${CI_REGISTRY_IMAGE}/gnome:${BRANCH}
+
+        - buildah push ${CI_REGISTRY_IMAGE}/gnome:${BRANCH}
+
+        # build and push the rust_bundle image
+        - |
+          CONTAINER=$(buildah from ${CI_REGISTRY_IMAGE}/gnome:${BRANCH})
+
+          buildah run $CONTAINER flatpak install --user --noninteractive \
+                    org.freedesktop.Sdk.Extension.rust-stable//${FD_BRANCH}
+
+          buildah commit $CONTAINER ${CI_REGISTRY_IMAGE}/rust_bundle:${BRANCH}
+
+        - buildah push ${CI_REGISTRY_IMAGE}/rust_bundle:${BRANCH}
+    only:
+        - master
+        - triggers
+        - schedules
+
+
 gnome:master:
     stage: runtimes
-    extends: .build_template
+    extends: .sdk_template
     variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/gnome:master
-        DOCKERFILE: gnome-master/Dockerfile
+        BRANCH: master
+        FD_BRANCH: "19.08"
 
 gnome:3.32:
     stage: runtimes
-    extends: .build_template
+    extends: .sdk_template
     variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/gnome:3.32
-        DOCKERFILE: gnome-3-32/Dockerfile
+        BRANCH: "3.32"
+        FD_BRANCH: "18.08"
 
 gnome:3.34:
     stage: runtimes
-    extends: .build_template
+    extends: .sdk_template
     variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/gnome:3.34
-        DOCKERFILE: gnome-3-34/Dockerfile
+        BRANCH: "3.34"
+        FD_BRANCH: "19.08"
 
 gnome:3.36:
     stage: runtimes
-    extends: .build_template
+    extends: .sdk_template
     variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/gnome:3.36
-        DOCKERFILE: gnome-3-36/Dockerfile
-
-rust master:
-    stage: rust_bundle
-    extends: .build_template
-    before_script:
-        - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:master"
-        - export BRANCH="19.08"
-        - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust
-        - sed -i "s|@BRANCH@|$BRANCH|" sdk-bundles/rust
-    variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/rust_bundle:master
-        DOCKERFILE: sdk-bundles/rust
-
-rust 3.32:
-    stage: rust_bundle
-    extends: .build_template
-    before_script:
-        - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:3.32"
-        - export BRANCH="18.08"
-        - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust
-        - sed -i "s|@BRANCH@|$BRANCH|" sdk-bundles/rust
-    variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/rust_bundle:3.32
-        DOCKERFILE: sdk-bundles/rust
-
-rust 3.34:
-    stage: rust_bundle
-    extends: .build_template
-    before_script:
-        - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:3.34"
-        - export BRANCH="19.08"
-        - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust
-        - sed -i "s|@BRANCH@|$BRANCH|" sdk-bundles/rust
-    variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/rust_bundle:3.34
-        DOCKERFILE: sdk-bundles/rust
-
-rust 3.34:
-    stage: rust_bundle
-    extends: .build_template
-    before_script:
-        - export BASE_IMAGE="registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:3.36"
-        - export BRANCH="19.08"
-        - sed -e "s|@BASE_IMAGE@|$BASE_IMAGE|" sdk-bundles/rust-bundle.template > sdk-bundles/rust
-        - sed -i "s|@BRANCH@|$BRANCH|" sdk-bundles/rust
-    variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/rust_bundle:3.36
-        DOCKERFILE: sdk-bundles/rust
+        BRANCH: "3.36"
+        FD_BRANCH: "19.08"
