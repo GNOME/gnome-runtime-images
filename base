@@ -24,8 +24,10 @@ RUN cat /dev/urandom | tr -dc a-f0-9 | head -c32 > /etc/machine-id && echo "" >>
 
 RUN dnf -y update && \
     dnf install -y flatpak flatpak-builder librsvg2 ostree fuse elfutils \
-    dconf dbus-daemon git bzr xorg-x11-server-Xvfb dbus-x11 && \
+    dconf dbus-daemon git bzr xorg-x11-server-Xvfb dbus-x11 python3-ruamel-yaml && \
     dnf clean all
+
+COPY rewrite-flatpak-manifest /usr/local/bin/rewrite-flatpak-manifest
 
 USER build
 
