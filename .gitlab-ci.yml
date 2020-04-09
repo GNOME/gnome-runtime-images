@@ -30,7 +30,11 @@ default:
         - echo ${DOCKERFILE} / ${DOCKERIMAGE}
 
         - buildah bud -f ${DOCKERFILE} -t ${DOCKERIMAGE} .
-        - buildah push ${DOCKERIMAGE}
+        # push only on master branch
+        - |
+          if [ $CI_COMMIT_REF_NAME == master ]; then
+              buildah push ${DOCKERIMAGE}
+          fi
     after_script:
         # don't try to use systemd/journald
         - |
@@ -40,10 +44,6 @@ default:
           END
         - podman run --rm ${DOCKERIMAGE} flatpak list --columns=application,branch,arch,active,size
         - buildah inspect --format "{{.FromImageID}}" ${DOCKERIMAGE}
-    only:
-        - master
-        - triggers
-        - schedules
 
 base:
     stage: base
@@ -64,7 +64,7 @@ flat-manager-client:
 # branch it is based on
 .sdk_template:
     script:
-        # build and push the flatpak sdk image
+        # build the flatpak sdk image
         - |
           CONTAINER=$(buildah from ${CI_REGISTRY_IMAGE}/base)
 
@@ -73,9 +73,8 @@ flat-manager-client:
 
           buildah commit $CONTAINER ${CI_REGISTRY_IMAGE}/gnome:${BRANCH}
 
-        - buildah push ${CI_REGISTRY_IMAGE}/gnome:${BRANCH}
 
-        # build and push the rust_bundle image
+        # build the rust_bundle image
         - |
           CONTAINER=$(buildah from ${CI_REGISTRY_IMAGE}/gnome:${BRANCH})
 
@@ -84,11 +83,12 @@ flat-manager-client:
 
           buildah commit $CONTAINER ${CI_REGISTRY_IMAGE}/rust_bundle:${BRANCH}
 
-        - buildah push ${CI_REGISTRY_IMAGE}/rust_bundle:${BRANCH}
-    only:
-        - master
-        - triggers
-        - schedules
+        # push only on master branch
+        - |
+          if [ $CI_COMMIT_REF_NAME == master ]; then
+              buildah push ${CI_REGISTRY_IMAGE}/gnome:${BRANCH}
+              buildah push ${CI_REGISTRY_IMAGE}/rust_bundle:${BRANCH}
+          fi
 
 
 gnome:master:
