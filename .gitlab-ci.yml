@@ -65,6 +65,7 @@ flat-manager-client:
 # Expects ${BRANCH} and ${FD_BRANCH} variables which are the gnome branch and the freedesktop-sdk
 # branch it is based on
 .sdk_template:
+    needs: []
     script:
         # build the flatpak sdk image
         - |
@@ -99,6 +100,12 @@ gnome:master:
     variables:
         BRANCH: master
         FD_BRANCH: "19.08"
+    rules:
+      - if: "$CI_MERGE_REQUEST_ID"
+        when: 'always'
+      - if: "$CI_COMMIT_BRANCH == 'master'"
+        when: 'always'
+      - when: 'manual'
 
 gnome:3.32:
     stage: runtimes
@@ -106,6 +113,10 @@ gnome:3.32:
     variables:
         BRANCH: "3.32"
         FD_BRANCH: "18.08"
+    rules:
+      - if: '$REBUILD_3_32'
+        when: 'always'
+      - when: 'manual'
 
 gnome:3.34:
     stage: runtimes
@@ -113,6 +124,10 @@ gnome:3.34:
     variables:
         BRANCH: "3.34"
         FD_BRANCH: "19.08"
+    rules:
+      - if: '$REBUILD_3_34'
+        when: 'always'
+      - when: 'manual'
 
 gnome:3.36:
     stage: runtimes
@@ -120,3 +135,7 @@ gnome:3.36:
     variables:
         BRANCH: "3.36"
         FD_BRANCH: "19.08"
+    rules:
+      - if: '$REBUILD_3_36'
+        when: 'always'
+      - when: 'manual'
