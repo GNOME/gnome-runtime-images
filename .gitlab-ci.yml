@@ -44,6 +44,8 @@ default:
           END
         - podman run --rm ${DOCKERIMAGE} flatpak list --columns=application,branch,arch,active,size
         - buildah inspect --format "{{.FromImageID}}" ${DOCKERIMAGE}
+    rules:
+      - when: 'manual'
 
 base:
     stage: base
