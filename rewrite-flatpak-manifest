@@ -38,6 +38,8 @@ if __name__ == '__main__':
                 continue
 
             if mod['name'] == modulename:
-                assert len(mod['sources']) == 1
-                path = os.path.relpath('.', os.path.dirname(manifestfile))
-                mod['sources'] = [{'type': 'dir', 'path': path}]
+                for i in range(0, len(mod['sources'])):
+                    if not mod['sources'][i]['type'] == 'git':
+                        continue
+                    path = os.path.relpath('.', os.path.dirname(manifestfile))
+                    mod['sources'][i] = {'type': 'dir', 'path': path}
