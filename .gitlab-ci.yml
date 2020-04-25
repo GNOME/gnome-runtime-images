@@ -11,8 +11,6 @@ stages:
     - rust_bundle
 
 default:
-    tags:
-        - privileged
     before_script:
         - dnf install -y buildah podman
         - buildah login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
