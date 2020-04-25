@@ -46,6 +46,7 @@ default:
         - buildah inspect --format "{{.FromImageID}}" ${DOCKERIMAGE}
     rules:
       - when: 'manual'
+        allow_failure: true
 
 base:
     stage: base
@@ -106,6 +107,7 @@ gnome:master:
       - if: "$CI_COMMIT_BRANCH == 'master'"
         when: 'always'
       - when: 'manual'
+        allow_failure: true
 
 gnome:3.32:
     stage: runtimes
@@ -117,6 +119,7 @@ gnome:3.32:
       - if: '$REBUILD_3_32'
         when: 'always'
       - when: 'manual'
+        allow_failure: true
 
 gnome:3.34:
     stage: runtimes
@@ -128,6 +131,7 @@ gnome:3.34:
       - if: '$REBUILD_3_34'
         when: 'always'
       - when: 'manual'
+        allow_failure: true
 
 gnome:3.36:
     stage: runtimes
@@ -139,3 +143,4 @@ gnome:3.36:
       - if: '$REBUILD_3_36'
         when: 'always'
       - when: 'manual'
+        allow_failure: true
