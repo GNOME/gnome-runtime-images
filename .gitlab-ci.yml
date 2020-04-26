@@ -81,76 +81,109 @@ flat-manager-client:
           echo "Commiting $TAG"
           buildah commit $CONTAINER $TAG
 
+        # push only on master branch
+        - |
+          if [ $CI_COMMIT_REF_NAME == master ]; then
+              echo "Pushing $TAG"
+              buildah push $TAG
+          fi
+
+.rust_template:
+    script:
         # build the rust_bundle image
         - |
-          CONTAINER=$(buildah from $TAG)
+          CONTAINER=$(buildah from "${CI_REGISTRY_IMAGE}/gnome:${BRANCH}")
 
-          export RUST_TAG="${CI_REGISTRY_IMAGE}/rust_bundle:${BRANCH}"
-          echo "Building $RUST_TAG"
+          export TAG="${CI_REGISTRY_IMAGE}/rust_bundle:${BRANCH}"
+          echo "Building $TAG"
 
           buildah run $CONTAINER flatpak install --user --noninteractive \
                     org.freedesktop.Sdk.Extension.rust-stable//${FD_BRANCH}
 
-          echo "Commiting $RUST_TAG"
-          buildah commit $CONTAINER $RUST_TAG
+          echo "Commiting $TAG"
+          buildah commit $CONTAINER $TAG
 
         # push only on master branch
         - |
           if [ $CI_COMMIT_REF_NAME == master ]; then
               echo "Pushing $TAG"
               buildah push $TAG
-
-              echo "Pushing $RUST_TAG"
-              buildah push $RUST_TAG
           fi
 
+.vars_nightly:
+  variables:
+    BRANCH: master
+    FD_BRANCH: "19.08"
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+      when: 'always'
+    - if: "$CI_COMMIT_BRANCH == 'master'"
+      when: 'always'
+    - when: 'manual'
+      allow_failure: true
 
-gnome:master:
-    stage: runtimes
-    extends: .sdk_template
-    variables:
-        BRANCH: master
-        FD_BRANCH: "19.08"
-    rules:
-      - if: "$CI_MERGE_REQUEST_ID"
-        when: 'always'
-      - if: "$CI_COMMIT_BRANCH == 'master'"
-        when: 'always'
-      - when: 'manual'
-        allow_failure: true
+.vars_3_32:
+  variables:
+    BRANCH: "3.32"
+    FD_BRANCH: "18.08"
+  rules:
+    - if: '$REBUILD_3_32'
+      when: 'always'
+    - when: 'manual'
+      allow_failure: true
+
+.vars_3_34:
+  variables:
+    BRANCH: "3.34"
+    FD_BRANCH: "19.08"
+  rules:
+    - if: '$REBUILD_3_34'
+      when: 'always'
+    - when: 'manual'
+      allow_failure: true
+
+.vars_3_36:
+  variables:
+    BRANCH: "3.36"
+    FD_BRANCH: "19.08"
+  rules:
+    - if: '$REBUILD_3_36'
+      when: 'always'
+    - when: 'manual'
+      allow_failure: true
+
+gnome:nightly:
+  stage: 'runtimes'
+  extends: ['.sdk_template', '.vars_nightly']
 
 gnome:3.32:
-    stage: runtimes
-    extends: .sdk_template
-    variables:
-        BRANCH: "3.32"
-        FD_BRANCH: "18.08"
-    rules:
-      - if: '$REBUILD_3_32'
-        when: 'always'
-      - when: 'manual'
-        allow_failure: true
+  stage: 'runtimes'
+  extends: ['.sdk_template', '.vars_3_32']
 
 gnome:3.34:
-    stage: runtimes
-    extends: .sdk_template
-    variables:
-        BRANCH: "3.34"
-        FD_BRANCH: "19.08"
-    rules:
-      - if: '$REBUILD_3_34'
-        when: 'always'
-      - when: 'manual'
-        allow_failure: true
+  stage: 'runtimes'
+  extends: ['.sdk_template', '.vars_3_34']
 
 gnome:3.36:
-    stage: runtimes
-    extends: .sdk_template
-    variables:
-        BRANCH: "3.36"
-        FD_BRANCH: "19.08"
-    rules:
-      - if: '$REBUILD_3_36'
-        when: 'always'
-      - when: 'manual'
-        allow_failure: true
+  stage: 'runtimes'
+  extends: ['.sdk_template', '.vars_3_36']
+
+rust:nightly:
+  stage: 'rust_bundle'
+  needs: ['gnome:nightly']
+  extends: ['.rust_template', '.vars_nightly']
+
+rust:3.32:
+  stage: 'rust_bundle'
+  needs: ['gnome:3.32']
+  extends: ['.rust_template', '.vars_3_32']
+
+rust:3.34:
+  stage: 'rust_bundle'
+  needs: ['gnome:3.34']
+  extends: ['.rust_template', '.vars_3_34']
+
+rust:3.36:
+  stage: 'rust_bundle'
+  needs: ['gnome:3.36']
+  extends: ['.rust_template', '.vars_3_36']
