@@ -72,26 +72,36 @@ flat-manager-client:
         - |
           CONTAINER=$(buildah from ${CI_REGISTRY_IMAGE}/base)
 
+          export TAG="${CI_REGISTRY_IMAGE}/gnome:${BRANCH}"
+          echo "Building $TAG"
+
           buildah run $CONTAINER flatpak install --user --noninteractive \
                     org.gnome.Sdk//${BRANCH} org.gnome.Platform//${BRANCH}
 
-          buildah commit $CONTAINER ${CI_REGISTRY_IMAGE}/gnome:${BRANCH}
-
+          echo "Commiting $TAG"
+          buildah commit $CONTAINER $TAG
 
         # build the rust_bundle image
         - |
-          CONTAINER=$(buildah from ${CI_REGISTRY_IMAGE}/gnome:${BRANCH})
+          CONTAINER=$(buildah from $TAG)
+
+          export RUST_TAG="${CI_REGISTRY_IMAGE}/rust_bundle:${BRANCH}"
+          echo "Building $RUST_TAG"
 
           buildah run $CONTAINER flatpak install --user --noninteractive \
                     org.freedesktop.Sdk.Extension.rust-stable//${FD_BRANCH}
 
-          buildah commit $CONTAINER ${CI_REGISTRY_IMAGE}/rust_bundle:${BRANCH}
+          echo "Commiting $RUST_TAG"
+          buildah commit $CONTAINER $RUST_TAG
 
         # push only on master branch
         - |
           if [ $CI_COMMIT_REF_NAME == master ]; then
-              buildah push ${CI_REGISTRY_IMAGE}/gnome:${BRANCH}
-              buildah push ${CI_REGISTRY_IMAGE}/rust_bundle:${BRANCH}
+              echo "Pushing $TAG"
+              buildah push $TAG
+
+              echo "Pushing $RUST_TAG"
+              buildah push $RUST_TAG
           fi
 
 
