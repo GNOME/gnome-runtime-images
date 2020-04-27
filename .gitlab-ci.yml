@@ -170,20 +170,16 @@ gnome:3.36:
 
 rust:nightly:
   stage: 'rust_bundle'
-  needs: ['gnome:nightly']
   extends: ['.rust_template', '.vars_nightly']
 
 rust:3.32:
   stage: 'rust_bundle'
-  needs: ['gnome:3.32']
   extends: ['.rust_template', '.vars_3_32']
 
 rust:3.34:
   stage: 'rust_bundle'
-  needs: ['gnome:3.34']
   extends: ['.rust_template', '.vars_3_34']
 
 rust:3.36:
   stage: 'rust_bundle'
-  needs: ['gnome:3.36']
   extends: ['.rust_template', '.vars_3_36']
