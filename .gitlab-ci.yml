@@ -113,7 +113,7 @@ flat-manager-client:
 .vars_nightly:
   variables:
     BRANCH: master
-    FD_BRANCH: "19.08"
+    FD_BRANCH: "20.08"
   rules:
     - if: "$CI_MERGE_REQUEST_ID"
       when: 'always'
