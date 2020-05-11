@@ -17,16 +17,16 @@ ENV FLATPAK_GL_DRIVERS=dummy
 RUN useradd --home-dir /build --create-home --shell /bin/bash build
 WORKDIR /build
 
-# Add a machine-id as specified in the freedesktop spec:
-# https://www.freedesktop.org/software/systemd/man/machine-id.html
-# gnome-builder test suite depends on this
-RUN cat /dev/urandom | tr -dc a-f0-9 | head -c32 > /etc/machine-id && echo "" >> /etc/machine-id
-
 RUN dnf upgrade -y --best --allowerasing && \
     dnf install -y flatpak flatpak-builder librsvg2 ostree fuse elfutils \
-    dconf dbus-daemon git bzr xorg-x11-server-Xvfb dbus-x11 python3-ruamel-yaml \
+    dconf dbus-daemon dbus-tools git bzr xorg-x11-server-Xvfb dbus-x11 python3-ruamel-yaml \
     python3-gobject json-glib && \
     dnf clean all
+
+# generate machine-id as specified in the freedesktop spec:
+# https://www.freedesktop.org/software/systemd/man/machine-id.html
+# for exmaple, gnome-builder test suite depends on this
+RUN dbus-uuidgen > /etc/machine-id
 
 COPY rewrite-flatpak-manifest /usr/local/bin/rewrite-flatpak-manifest
 
