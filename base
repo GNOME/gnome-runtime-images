@@ -1,6 +1,6 @@
 FROM registry.fedoraproject.org/fedora:latest
 
-RUN dnf -y update && dnf install -y git 'dnf-command(builddep)' libtool \
+RUN dnf upgrade -y --best --allowerasing && dnf install -y git 'dnf-command(builddep)' libtool \
         automake gettext-devel autoconf && \
     dnf builddep -y flatpak-builder && \
     dnf groupinstall -y "Development Tools"
@@ -22,7 +22,7 @@ WORKDIR /build
 # gnome-builder test suite depends on this
 RUN cat /dev/urandom | tr -dc a-f0-9 | head -c32 > /etc/machine-id && echo "" >> /etc/machine-id
 
-RUN dnf -y update && \
+RUN dnf upgrade -y --best --allowerasing && \
     dnf install -y flatpak flatpak-builder librsvg2 ostree fuse elfutils \
     dconf dbus-daemon git bzr xorg-x11-server-Xvfb dbus-x11 python3-ruamel-yaml \
     python3-gobject json-glib && \
