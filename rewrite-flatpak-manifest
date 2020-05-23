@@ -12,7 +12,7 @@ import os, sys
 
 from contextlib import contextmanager
 
-def rewrite_json_manifest(filename):
+def rewrite_json_manifest(filename, config):
     with open(filename) as f:
         data = Json.from_string(f.read())
 
@@ -36,10 +36,16 @@ def rewrite_json_manifest(filename):
 
             mod.set_array_member('sources', new_sources)
 
+            if config:
+                newconfig = Json.Array.sized_new(len(config))
+                for arg in config:
+                    newconfig.add_string_element(arg)
+                mod.set_array_member('config-opts', newconfig)
+
     with open(filename, 'w') as f:
         f.write(Json.to_string(data, True))
 
-def rewrite_yaml_manifest(filename):
+def rewrite_yaml_manifest(filename, config):
     with open(filename) as f:
         data = yaml.round_trip_load(f, preserve_quotes=True)
 
@@ -54,17 +60,22 @@ def rewrite_yaml_manifest(filename):
                 path = os.path.relpath('.', os.path.dirname(manifestfile))
                 mod['sources'][i] = {'type': 'dir', 'path': path}
 
+                if config:
+                    mod['config-opts'] = config
+
     with open(filename, 'w') as f:
         yaml.round_trip_dump(data, f)
 
 if __name__ == '__main__':
     try:
-        manifestfile, modulename = sys.argv[1:]
+        manifestfile = sys.argv[1]
+        modulename = sys.argv[2]
+        config = sys.argv[3:]
     except ValueError:
-        print("usage: {} flatpak_manifest module_name".format(sys.argv[0]))
+        print("usage: {} flatpak_manifest module_name [config-opt ...]".format(sys.argv[0]))
         sys.exit(1)
 
     if manifestfile.endswith('.json'):
-        rewrite_json_manifest(manifestfile)
+        rewrite_json_manifest(manifestfile, config)
     else:
-        rewrite_yaml_manifest(manifestfile)
+        rewrite_yaml_manifest(manifestfile, config)
