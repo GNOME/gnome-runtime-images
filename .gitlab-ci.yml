@@ -171,6 +171,8 @@ gnome:3.36:
 rust:nightly:
   stage: 'rust_bundle'
   extends: ['.rust_template', '.vars_nightly']
+  rules:
+    - when: 'manual'
 
 rust:3.32:
   stage: 'rust_bundle'
