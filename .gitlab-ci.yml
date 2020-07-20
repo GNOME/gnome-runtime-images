@@ -1,9 +1,10 @@
-image: 'registry.fedoraproject.org/fedora:30'
+image: 'registry.fedoraproject.org/fedora:32'
 
 # Buildah can't use 'overlay' driver when running inside docker
 variables:
-    STORAGE_DRIVER: vfs
-    BUILDAH_FORMAT: docker
+    STORAGE_DRIVER: 'vfs'
+    BUILDAH_FORMAT: 'docker'
+    BUILDAH_ISOLATION: 'chroot'
 
 stages:
     - base
@@ -11,10 +12,8 @@ stages:
     - rust_bundle
 
 default:
-    tags:
-        - privileged
     before_script:
-        - dnf install -y buildah podman
+        - dnf install -y buildah podman runc
         - buildah login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
 
         # Newer versions of podman/buildah try to set overlayfs mount options when
@@ -42,7 +41,7 @@ default:
           cgroup_manager = "cgroupfs"
           events_logger = "file"
           END
-        - podman run --rm ${DOCKERIMAGE} flatpak list --columns=application,branch,arch,active,size
+        # - podman run --rm ${DOCKERIMAGE} flatpak list --columns=application,branch,arch,active,size
         - buildah inspect --format "{{.FromImageID}}" ${DOCKERIMAGE}
     rules:
       - when: 'manual'
