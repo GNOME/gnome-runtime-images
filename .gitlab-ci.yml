@@ -121,26 +121,6 @@ flat-manager-client:
     - when: 'manual'
       allow_failure: true
 
-.vars_3_32:
-  variables:
-    BRANCH: "3.32"
-    FD_BRANCH: "18.08"
-  rules:
-    - if: '$REBUILD_3_32'
-      when: 'always'
-    - when: 'manual'
-      allow_failure: true
-
-.vars_3_34:
-  variables:
-    BRANCH: "3.34"
-    FD_BRANCH: "19.08"
-  rules:
-    - if: '$REBUILD_3_34'
-      when: 'always'
-    - when: 'manual'
-      allow_failure: true
-
 .vars_3_36:
   variables:
     BRANCH: "3.36"
@@ -151,34 +131,36 @@ flat-manager-client:
     - when: 'manual'
       allow_failure: true
 
+.vars_3_38:
+  variables:
+    BRANCH: "3.38"
+    FD_BRANCH: "20.08"
+  rules:
+    - if: '$REBUILD_3_38'
+      when: 'always'
+    - when: 'manual'
+      allow_failure: true
+
 gnome:nightly:
   stage: 'runtimes'
   extends: ['.sdk_template', '.vars_nightly']
-
-gnome:3.32:
-  stage: 'runtimes'
-  extends: ['.sdk_template', '.vars_3_32']
-
-gnome:3.34:
-  stage: 'runtimes'
-  extends: ['.sdk_template', '.vars_3_34']
 
 gnome:3.36:
   stage: 'runtimes'
   extends: ['.sdk_template', '.vars_3_36']
 
+gnome:3.38:
+  stage: 'runtimes'
+  extends: ['.sdk_template', '.vars_3_38']
+
 rust:nightly:
   stage: 'rust_bundle'
   extends: ['.rust_template', '.vars_nightly']
 
-rust:3.32:
-  stage: 'rust_bundle'
-  extends: ['.rust_template', '.vars_3_32']
-
-rust:3.34:
-  stage: 'rust_bundle'
-  extends: ['.rust_template', '.vars_3_34']
-
 rust:3.36:
   stage: 'rust_bundle'
   extends: ['.rust_template', '.vars_3_36']
+
+rust:3.38:
+  stage: 'rust_bundle'
+  extends: ['.rust_template', '.vars_3_38']
