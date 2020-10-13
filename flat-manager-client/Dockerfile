@@ -8,5 +8,5 @@ RUN dnf -y update && \
     dnf clean all
 
 RUN curl -o /usr/bin/flat-manager-client \
-    https://raw.githubusercontent.com/flatpak/flat-manager/0.3.4/flat-manager-client && \
+    https://raw.githubusercontent.com/flatpak/flat-manager/0.3.7/flat-manager-client && \
     chmod a+x /usr/bin/flat-manager-client
