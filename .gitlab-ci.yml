@@ -1,4 +1,4 @@
-image: 'arm64v8/fedora:latest'
+image: 'registry.fedoraproject.org/fedora:32'
 
 # Buildah can't use 'overlay' driver when running inside docker
 variables:
@@ -19,6 +19,8 @@ default:
         # Newer versions of podman/buildah try to set overlayfs mount options when
         # using the vfs driver, and this causes errors.
         - sed -i '/^mountopt =.*/d' /etc/containers/storage.conf
+
+        - podman run --rm --privileged multiarch/qemu-user-static --reset -p yes
     retry: 1
 
 # Expects ${DOCKERIMAGE} which should be the name+tag of the registry image.
@@ -50,7 +52,7 @@ default:
 base:
     stage: base
     tags:
-      - librem5:arm64
+      - flatpak
     extends: .dockerfile_template
     variables:
         DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/base
@@ -59,7 +61,7 @@ base:
 flat-manager-client:
     stage: base
     tags:
-      - librem5:arm64
+      - flatpak
     extends: .dockerfile_template
     variables:
         DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/flat-manager-client
@@ -148,35 +150,25 @@ flat-manager-client:
 gnome:nightly:
   stage: 'runtimes'
   tags:
-    - librem5:arm64
+    - flatpak
   extends: ['.sdk_template', '.vars_nightly']
 
 gnome:3.36:
   stage: 'runtimes'
-  tags:
-    - librem5:arm64
   extends: ['.sdk_template', '.vars_3_36']
 
 gnome:3.38:
   stage: 'runtimes'
-  tags:
-    - librem5:arm64
   extends: ['.sdk_template', '.vars_3_38']
 
 rust:nightly:
   stage: 'rust_bundle'
-  tags:
-    - librem5:arm64
   extends: ['.rust_template', '.vars_nightly']
 
 rust:3.36:
   stage: 'rust_bundle'
-  tags:
-    - librem5:arm64
   extends: ['.rust_template', '.vars_3_36']
 
 rust:3.38:
   stage: 'rust_bundle'
-  tags:
-    - librem5:arm64
   extends: ['.rust_template', '.vars_3_38']
