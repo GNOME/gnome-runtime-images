@@ -1,4 +1,4 @@
-FROM registry.fedoraproject.org/fedora:latest
+FROM arm64v8/fedora:latest
 
 VOLUME /build
 WORKDIR /build

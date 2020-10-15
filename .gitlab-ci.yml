@@ -1,4 +1,4 @@
-image: 'registry.fedoraproject.org/fedora:32'
+image: 'arm64v8/fedora:latest'
 
 # Buildah can't use 'overlay' driver when running inside docker
 variables:
@@ -49,6 +49,8 @@ default:
 
 base:
     stage: base
+    tags:
+      - librem5:arm64
     extends: .dockerfile_template
     variables:
         DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/base
@@ -56,6 +58,8 @@ base:
 
 flat-manager-client:
     stage: base
+    tags:
+      - librem5:arm64
     extends: .dockerfile_template
     variables:
         DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/flat-manager-client
@@ -143,24 +147,36 @@ flat-manager-client:
 
 gnome:nightly:
   stage: 'runtimes'
+  tags:
+    - librem5:arm64
   extends: ['.sdk_template', '.vars_nightly']
 
 gnome:3.36:
   stage: 'runtimes'
+  tags:
+    - librem5:arm64
   extends: ['.sdk_template', '.vars_3_36']
 
 gnome:3.38:
   stage: 'runtimes'
+  tags:
+    - librem5:arm64
   extends: ['.sdk_template', '.vars_3_38']
 
 rust:nightly:
   stage: 'rust_bundle'
+  tags:
+    - librem5:arm64
   extends: ['.rust_template', '.vars_nightly']
 
 rust:3.36:
   stage: 'rust_bundle'
+  tags:
+    - librem5:arm64
   extends: ['.rust_template', '.vars_3_36']
 
 rust:3.38:
   stage: 'rust_bundle'
+  tags:
+    - librem5:arm64
   extends: ['.rust_template', '.vars_3_38']
