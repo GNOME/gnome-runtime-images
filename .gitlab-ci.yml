@@ -141,6 +141,16 @@ flat-manager-client:
     - when: 'manual'
       allow_failure: true
 
+.vars_40:
+  variables:
+    BRANCH: "40"
+    FD_BRANCH: "20.08"
+  rules:
+    - if: '$REBUILD_40'
+      when: 'always'
+    - when: 'manual'
+      allow_failure: true
+
 gnome:nightly:
   stage: 'runtimes'
   extends: ['.sdk_template', '.vars_nightly']
@@ -153,6 +163,10 @@ gnome:3.38:
   stage: 'runtimes'
   extends: ['.sdk_template', '.vars_3_38']
 
+gnome:40:
+  stage: 'runtimes'
+  extends: ['.sdk_template', '.vars_40']
+
 rust:nightly:
   stage: 'rust_bundle'
   extends: ['.rust_template', '.vars_nightly']
@@ -164,3 +178,7 @@ rust:3.36:
 rust:3.38:
   stage: 'rust_bundle'
   extends: ['.rust_template', '.vars_3_38']
+
+rust:40:
+  stage: 'rust_bundle'
+  extends: ['.rust_template', '.vars_40']
