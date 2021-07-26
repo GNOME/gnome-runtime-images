@@ -9,7 +9,7 @@ variables:
 stages:
     - base
     - runtimes
-    - rust_bundle
+    - bundles
 
 default:
     before_script:
@@ -109,10 +109,33 @@ flat-manager-client:
               buildah push $TAG
           fi
 
+.llvm_template:
+    script:
+        # build the llvm_bundle image
+        - |
+          CONTAINER=$(buildah from "${CI_REGISTRY_IMAGE}/gnome:${BRANCH}")
+
+          export TAG="${CI_REGISTRY_IMAGE}/llvm_bundle:${BRANCH}"
+          echo "Building $TAG"
+
+          buildah run $CONTAINER flatpak install --user --noninteractive \
+                    org.freedesktop.Sdk.Extension.llvm${LLVM_VERSION}//${FD_BRANCH}
+
+          echo "Commiting $TAG"
+          buildah commit $CONTAINER $TAG
+
+        # push only on master branch
+        - |
+          if [ $CI_COMMIT_REF_NAME == master ]; then
+              echo "Pushing $TAG"
+              buildah push $TAG
+          fi
+
 .vars_nightly:
   variables:
     BRANCH: master
     FD_BRANCH: "21.08beta"
+    LLVM_VERSION: "12"
   rules:
     - if: "$CI_MERGE_REQUEST_ID"
       when: 'always'
@@ -168,17 +191,21 @@ gnome:40:
   extends: ['.sdk_template', '.vars_40']
 
 rust:nightly:
-  stage: 'rust_bundle'
+  stage: 'bundles'
   extends: ['.rust_template', '.vars_nightly']
 
 rust:3.36:
-  stage: 'rust_bundle'
+  stage: 'bundles'
   extends: ['.rust_template', '.vars_3_36']
 
 rust:3.38:
-  stage: 'rust_bundle'
+  stage: 'bundles'
   extends: ['.rust_template', '.vars_3_38']
 
 rust:40:
-  stage: 'rust_bundle'
+  stage: 'bundles'
   extends: ['.rust_template', '.vars_40']
+
+llvm:nightly:
+  stage: 'bundles'
+  extends: ['.llvm_template', '.vars_nightly']
