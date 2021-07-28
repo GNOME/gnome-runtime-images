@@ -1,4 +1,4 @@
-image: 'registry.fedoraproject.org/fedora:32'
+image: 'registry.fedoraproject.org/fedora:35'
 
 # Buildah can't use 'overlay' driver when running inside docker
 variables:
