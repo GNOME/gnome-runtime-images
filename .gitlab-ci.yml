@@ -134,7 +134,7 @@ flat-manager-client:
 .vars_nightly:
   variables:
     BRANCH: master
-    FD_BRANCH: "21.08beta"
+    FD_BRANCH: "21.08"
     LLVM_VERSION: "12"
   rules:
     - if: "$CI_MERGE_REQUEST_ID"
