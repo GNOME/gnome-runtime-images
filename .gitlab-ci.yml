@@ -122,10 +122,24 @@ flat-manager-client:
     - when: 'manual'
       allow_failure: true
 
+.vars_41:
+  variables:
+    BRANCH: "41"
+    FD_BRANCH: "21.08"
+  rules:
+    - if: '$REBUILD_41'
+      when: 'always'
+    - when: 'manual'
+      allow_failure: true
+
 gnome:nightly:
   stage: 'runtimes'
   extends: ['.sdk_template', '.vars_nightly']
 
 gnome:40:
+  stage: 'runtimes'
+  extends: ['.sdk_template', '.vars_40']
+
+gnome:41:
   stage: 'runtimes'
   extends: ['.sdk_template', '.vars_40']
