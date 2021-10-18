@@ -119,6 +119,7 @@ flat-manager-client:
   variables:
     BRANCH: "40"
     FD_BRANCH: "20.08"
+    LLVM_VERSION: "12"
   rules:
     - if: '$REBUILD_STABLE'
       when: 'always'
@@ -129,6 +130,7 @@ flat-manager-client:
   variables:
     BRANCH: "41"
     FD_BRANCH: "21.08"
+    LLVM_VERSION: "12"
   rules:
     - if: '$REBUILD_STABLE'
       when: 'always'
