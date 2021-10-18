@@ -95,8 +95,11 @@ flat-manager-client:
               echo "Pushing $TAG"
               buildah tag $TAG $LLVM_TAG $RUST_TAG
               buildah push $TAG
-              buildah push $LLVM_TAG
-              buildah push $RUST_TAG
+
+              if [ $BRANCH == "master" ] || [ $BRANCH == "40" ]; then
+                buildah push $LLVM_TAG
+                buildah push $RUST_TAG
+              fi
           fi
 
 .vars_nightly:
