@@ -5,7 +5,9 @@ RUN dnf upgrade -y --best --allowerasing && dnf install -y git 'dnf-command(buil
     dnf builddep -y flatpak-builder && \
     dnf groupinstall -y "Development Tools"
 
-RUN git clone --recursive https://github.com/flatpak/flatpak-builder -b run-without-fuse && \
+# FIXME: this is a rebased branch cause Bart is on vacation atm.
+# RUN git clone --recursive https://github.com/flatpak/flatpak-builder -b run-without-fuse && \
+RUN git clone --recursive https://github.com/alatiera/flatpak-builder -b alatiera/run-without-fuse-rebased && \
     cd flatpak-builder && \
     ./autogen.sh && make -j$(nproc)
 
