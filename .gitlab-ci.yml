@@ -162,4 +162,4 @@ gnome:41:
 
 gnome:42:
   stage: 'runtimes'
-  extends: ['.sdk_template', '.vars_41']
+  extends: ['.sdk_template', '.vars_42']
