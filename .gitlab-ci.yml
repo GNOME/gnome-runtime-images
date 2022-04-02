@@ -115,17 +115,6 @@ flat-manager-client:
     - when: 'manual'
       allow_failure: true
 
-.vars_40:
-  variables:
-    BRANCH: "40"
-    FD_BRANCH: "20.08"
-    LLVM_VERSION: "12"
-  rules:
-    - if: '$REBUILD_STABLE'
-      when: 'always'
-    - when: 'manual'
-      allow_failure: true
-
 .vars_41:
   variables:
     BRANCH: "41"
@@ -151,10 +140,6 @@ flat-manager-client:
 gnome:nightly:
   stage: 'runtimes'
   extends: ['.sdk_template', '.vars_nightly']
-
-gnome:40:
-  stage: 'runtimes'
-  extends: ['.sdk_template', '.vars_40']
 
 gnome:41:
   stage: 'runtimes'
