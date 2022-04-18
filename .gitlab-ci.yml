@@ -86,6 +86,9 @@ flat-manager-client:
           buildah run $CONTAINER flatpak install --user --noninteractive \
                     org.freedesktop.Sdk.Extension.llvm${LLVM_VERSION}//${FD_BRANCH}
 
+          buildah run $CONTAINER flatpak install --user --noninteractive \
+                    org.freedesktop.Sdk.Extension.llvm${LLVM_VERSION_2}//${FD_BRANCH}
+
           echo "Commiting $TAG"
           buildah commit $CONTAINER $TAG
 
@@ -107,6 +110,7 @@ flat-manager-client:
     BRANCH: master
     FD_BRANCH: "21.08"
     LLVM_VERSION: "12"
+    LLVM_VERSION_2: "13"
   rules:
     - if: "$CI_MERGE_REQUEST_ID"
       when: 'always'
@@ -120,6 +124,7 @@ flat-manager-client:
     BRANCH: "41"
     FD_BRANCH: "21.08"
     LLVM_VERSION: "12"
+    LLVM_VERSION_2: "13"
   rules:
     - if: '$REBUILD_STABLE'
       when: 'always'
@@ -131,6 +136,7 @@ flat-manager-client:
     BRANCH: "42"
     FD_BRANCH: "21.08"
     LLVM_VERSION: "12"
+    LLVM_VERSION_2: "13"
   rules:
     - if: '$REBUILD_STABLE'
       when: 'always'
