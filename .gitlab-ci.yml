@@ -27,15 +27,11 @@ default:
         - buildah bud -f ${DOCKERFILE} -t ${DOCKERIMAGE} .
         # push only on master branch
         - |
-          if [ $CI_COMMIT_REF_NAME == master ]; then
-              buildah push ${DOCKERIMAGE}
+          buildah push ${DOCKERIMAGE}
 
-              # Tag `x86_64` also without the ARCH to not break the old path
-              if [ $ARCH == "x86_64" ]; then
-                  buildah tag $DOCKERIMAGE $DOCKERIMAGE_OLD
-                  buildah push $DOCKERIMAGE_OLD
-              fi
-          fi
+          # Tag `x86_64` also without the ARCH to not break the old path
+          buildah tag $DOCKERIMAGE $DOCKERIMAGE_OLD
+          buildah push $DOCKERIMAGE_OLD
     after_script:
         # don't try to use systemd/journald
         - |
@@ -108,17 +104,15 @@ flat-manager-client:aarch64:
 
         # push only on master branch
         - |
-          if [ $CI_COMMIT_REF_NAME == master ]; then
-              echo "Pushing $TAG"
-              buildah push $TAG
+          echo "Pushing $TAG"
+          buildah push $TAG
 
-              # This is for backwards compatibility
-              if [ $ARCH == "x86_64" ]; then
-                  # Tag `x86_64` also without the ARCH to not break the old path
-                  export TAG_OLD="${CI_REGISTRY_IMAGE}/gnome:${BRANCH}"
-                  buildah tag $TAG $TAG_OLD
-                  buildah push $TAG_OLD
-              fi
+          # This is for backwards compatibility
+          if [ $ARCH == "x86_64" ]; then
+              # Tag `x86_64` also without the ARCH to not break the old path
+              export TAG_OLD="${CI_REGISTRY_IMAGE}/gnome:${BRANCH}"
+              buildah tag $TAG $TAG_OLD
+              buildah push $TAG_OLD
           fi
 
 .vars_aarch64:
