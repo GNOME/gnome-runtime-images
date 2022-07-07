@@ -55,14 +55,14 @@ base:
     variables:
         DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/${ARCH}/base
         DOCKERIMAGE_OLD: ${CI_REGISTRY_IMAGE}/base
-        DOCKERFILE: base
+        DOCKERFILE: Dockerfile
 
 base:aarch64:
     stage: base
     extends: ['.dockerfile_template', '.vars_aarch64']
     variables:
         DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/${ARCH}/base
-        DOCKERFILE: base
+        DOCKERFILE: Dockerfile
 
 flat-manager-client:
     stage: base
