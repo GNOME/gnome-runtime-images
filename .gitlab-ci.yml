@@ -1,5 +1,3 @@
-image: 'registry.fedoraproject.org/fedora:35'
-
 # Buildah can't use 'overlay' driver when running inside docker
 variables:
     STORAGE_DRIVER: 'vfs'
@@ -33,6 +31,12 @@ default:
         - |
           if [ $CI_COMMIT_REF_NAME == master ]; then
               buildah push ${DOCKERIMAGE}
+
+              # Tag `x86_64` also without the ARCH to not break the old path
+              if [ $ARCH == "x86_64" ]; then
+                  buildah tag $DOCKERIMAGE ${DOCKERIMAGE/\/x86_64/}
+                  buildah push ${DOCKERIMAGE/\/x86_64/}
+              fi
           fi
     after_script:
         # don't try to use systemd/journald
@@ -49,18 +53,31 @@ default:
 
 base:
     stage: base
-    extends: .dockerfile_template
+    extends: ['.dockerfile_template', '.vars_x86_64']
     variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/base
+        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/${ARCH}/base
+        DOCKERFILE: base
+
+base:aarch64:
+    stage: base
+    extends: ['.dockerfile_template', '.vars_aarch64']
+    variables:
+        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/${ARCH}/base
         DOCKERFILE: base
 
 flat-manager-client:
     stage: base
-    extends: .dockerfile_template
+    extends: ['.dockerfile_template', '.vars_x86_64']
     variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/flat-manager-client
+        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/${ARCH}/flat-manager-client
         DOCKERFILE: flat-manager-client/Dockerfile
 
+flat-manager-client:aarch64:
+    stage: base
+    extends: ['.dockerfile_template', '.vars_aarch64']
+    variables:
+        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/${ARCH}/flat-manager-client
+        DOCKERFILE: flat-manager-client/Dockerfile
 
 # Expects ${BRANCH} and ${FD_BRANCH} variables which are the gnome branch and the freedesktop-sdk
 # branch it is based on
@@ -69,9 +86,9 @@ flat-manager-client:
     script:
         # build the flatpak sdk image
         - |
-          CONTAINER=$(buildah from ${CI_REGISTRY_IMAGE}/base)
+          CONTAINER=$(buildah from ${CI_REGISTRY_IMAGE}/${ARCH}/base)
 
-          export TAG="${CI_REGISTRY_IMAGE}/gnome:${BRANCH}"
+          export TAG="${CI_REGISTRY_IMAGE}/${ARCH}/gnome:${BRANCH}"
           export LLVM_TAG="${CI_REGISTRY_IMAGE}/llvm_bundle:${BRANCH}"
           export RUST_TAG="${CI_REGISTRY_IMAGE}/rust_bundle:${BRANCH}"
 
@@ -99,11 +116,34 @@ flat-manager-client:
               buildah tag $TAG $LLVM_TAG $RUST_TAG
               buildah push $TAG
 
-              if [ $BRANCH == "master" ] || [ $BRANCH == "40" ]; then
-                buildah push $LLVM_TAG
-                buildah push $RUST_TAG
+              # This is for backwards compatibility
+              if [ $ARCH == "x86_64" ]; then
+                  # Tag `x86_64` also without the ARCH to not break the old path
+                  export OLD_TAG="${CI_REGISTRY_IMAGE}/gnome:${BRANCH}"
+                  buildah tag $TAG $TAG_OLD $LLVM_TAG $RUST_TAG
+                  buildah push $TAG_OLD
+
+                  if [ $BRANCH == "master" ] || [ $BRANCH == "40" ]; then
+                      buildah push $LLVM_TAG
+                      buildah push $RUST_TAG
+                  fi
               fi
           fi
+
+.vars_aarch64:
+  image: 'registry.fedoraproject.org/fedora:35-aarch64'
+  tags:
+    - aarch64
+  variables:
+    ARCH: aarch64
+
+.vars_x86_64:
+  image: 'registry.fedoraproject.org/fedora:35-x86_64'
+  tags:
+    - x86_64
+    - crun
+  variables:
+    ARCH: x86_64
 
 .vars_nightly:
   variables:
@@ -145,12 +185,20 @@ flat-manager-client:
 
 gnome:nightly:
   stage: 'runtimes'
-  extends: ['.sdk_template', '.vars_nightly']
+  extends: ['.sdk_template', '.vars_nightly', '.vars_x86_64']
 
 gnome:41:
   stage: 'runtimes'
-  extends: ['.sdk_template', '.vars_41']
+  extends: ['.sdk_template', '.vars_41', '.vars_x86_64']
 
 gnome:42:
   stage: 'runtimes'
-  extends: ['.sdk_template', '.vars_42']
+  extends: ['.sdk_template', '.vars_42', '.vars_x86_64']
+
+gnome:aarch64:nightly:
+  stage: 'runtimes'
+  extends: ['.sdk_template', '.vars_nightly', '.vars_aarch64']
+
+gnome:aarch64:42:
+  stage: 'runtimes'
+  extends: ['.sdk_template', '.vars_42', '.vars_aarch64']
