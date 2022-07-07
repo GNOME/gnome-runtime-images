@@ -17,6 +17,7 @@ default:
         # Newer versions of podman/buildah try to set overlayfs mount options when
         # using the vfs driver, and this causes errors.
         - sed -i '/^mountopt =.*/d' /etc/containers/storage.conf
+    interruptible: true
     retry: 1
 
 # Expects ${DOCKERIMAGE} which should be the name+tag of the registry image.
