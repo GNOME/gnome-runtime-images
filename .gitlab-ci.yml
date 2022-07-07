@@ -87,9 +87,6 @@ flat-manager-client:aarch64:
           CONTAINER=$(buildah from ${CI_REGISTRY_IMAGE}/${ARCH}/base)
 
           export TAG="${CI_REGISTRY_IMAGE}/${ARCH}/gnome:${BRANCH}"
-          export LLVM_TAG="${CI_REGISTRY_IMAGE}/llvm_bundle:${BRANCH}"
-          export RUST_TAG="${CI_REGISTRY_IMAGE}/rust_bundle:${BRANCH}"
-
           echo "Building $TAG"
 
           buildah run $CONTAINER flatpak install --user --noninteractive \
@@ -111,20 +108,14 @@ flat-manager-client:aarch64:
         - |
           if [ $CI_COMMIT_REF_NAME == master ]; then
               echo "Pushing $TAG"
-              buildah tag $TAG $LLVM_TAG $RUST_TAG
               buildah push $TAG
 
               # This is for backwards compatibility
               if [ $ARCH == "x86_64" ]; then
                   # Tag `x86_64` also without the ARCH to not break the old path
                   export OLD_TAG="${CI_REGISTRY_IMAGE}/gnome:${BRANCH}"
-                  buildah tag $TAG $TAG_OLD $LLVM_TAG $RUST_TAG
+                  buildah tag $TAG $TAG_OLD
                   buildah push $TAG_OLD
-
-                  if [ $BRANCH == "master" ] || [ $BRANCH == "40" ]; then
-                      buildah push $LLVM_TAG
-                      buildah push $RUST_TAG
-                  fi
               fi
           fi
 
