@@ -1,3 +1,5 @@
+image: quay.io/buildah/stable:v1.26
+
 # Buildah can't use 'overlay' driver when running inside docker
 variables:
     STORAGE_DRIVER: 'vfs'
@@ -11,12 +13,7 @@ stages:
 
 default:
     before_script:
-        - dnf install -y buildah podman runc
         - buildah login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
-
-        # Newer versions of podman/buildah try to set overlayfs mount options when
-        # using the vfs driver, and this causes errors.
-        - sed -i '/^mountopt =.*/d' /etc/containers/storage.conf
     interruptible: true
     retry: 1
 
@@ -132,14 +129,12 @@ flat-manager-client:aarch64:
           fi
 
 .vars_aarch64:
-  image: 'registry.fedoraproject.org/fedora:35-aarch64'
   tags:
     - aarch64
   variables:
     ARCH: aarch64
 
 .vars_x86_64:
-  image: 'registry.fedoraproject.org/fedora:35-x86_64'
   tags:
     - x86_64
     - crun
