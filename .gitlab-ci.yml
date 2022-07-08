@@ -1,5 +1,10 @@
 image: quay.io/buildah/stable:v1.26
 
+workflow:
+  rules:
+    - if: '$CI_COMMIT_TAG'
+    - if: '$CI_COMMIT_BRANCH'
+
 # Buildah can't use 'overlay' driver when running inside docker
 variables:
     STORAGE_DRIVER: 'vfs'
