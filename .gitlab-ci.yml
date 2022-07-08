@@ -10,6 +10,7 @@ stages:
     - base
     - runtimes
     - bundles
+    - manifests
 
 default:
     before_script:
@@ -29,12 +30,6 @@ default:
         - |
           if [ $CI_COMMIT_REF_NAME == master ]; then
               buildah push ${DOCKERIMAGE}
-
-              # Tag `x86_64` also without the ARCH to not break the old path
-              if [ $ARCH == "x86_64" ]; then
-                  buildah tag $DOCKERIMAGE $DOCKERIMAGE_OLD
-                  buildah push $DOCKERIMAGE_OLD
-              fi
           fi
     after_script:
         # don't try to use systemd/journald
@@ -49,12 +44,23 @@ default:
       - when: 'manual'
         allow_failure: true
 
+# Expects ${REGISTRY_TAG} which should be the name+tag of the manifest ref
+.manifest:
+  stage: 'manifests'
+  script:
+    - |
+      buildah manifest create ${REGISTRY_TAG}
+
+      buildah manifest add ${REGISTRY_TAG} docker://${CI_REGISTRY_IMAGE}/x86_64/${REGISTRY_TAG};
+      buildah manifest add ${REGISTRY_TAG} docker://${CI_REGISTRY_IMAGE}/aarch64/${REGISTRY_TAG};
+
+      buildah manifest push --all ${REGISTRY_TAG} docker://${CI_REGISTRY_IMAGE}/${REGISTRY_TAG}
+
 base:
     stage: base
     extends: ['.dockerfile_template', '.vars_x86_64']
     variables:
         DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/${ARCH}/base
-        DOCKERIMAGE_OLD: ${CI_REGISTRY_IMAGE}/base
         DOCKERFILE: Dockerfile
 
 base:aarch64:
@@ -64,12 +70,19 @@ base:aarch64:
         DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/${ARCH}/base
         DOCKERFILE: Dockerfile
 
+base-manifest:
+  extends: ['.manifest']
+  variables:
+    REGISTRY_TAG: 'base'
+  needs:
+    - base
+    - base:aarch64
+
 flat-manager-client:
     stage: base
     extends: ['.dockerfile_template', '.vars_x86_64']
     variables:
         DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/${ARCH}/flat-manager-client
-        DOCKERIMAGE_OLD: ${CI_REGISTRY_IMAGE}/flat-manager-client
         DOCKERFILE: flat-manager-client/Dockerfile
 
 flat-manager-client:aarch64:
@@ -79,6 +92,14 @@ flat-manager-client:aarch64:
         DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/${ARCH}/flat-manager-client
         DOCKERFILE: flat-manager-client/Dockerfile
 
+flat-manager-client-manifest:
+  extends: ['.manifest']
+  variables:
+    REGISTRY_TAG: 'flat-manager-client'
+  needs:
+    - flat-manager-client
+    - flat-manager-client:aarch64
+
 # Expects ${BRANCH} and ${FD_BRANCH} variables which are the gnome branch and the freedesktop-sdk
 # branch it is based on
 .sdk_template:
@@ -86,7 +107,7 @@ flat-manager-client:aarch64:
     script:
         # build the flatpak sdk image
         - |
-          CONTAINER=$(buildah from ${CI_REGISTRY_IMAGE}/${ARCH}/base)
+          CONTAINER=$(buildah from ${CI_REGISTRY_IMAGE}/base)
 
           export TAG="${CI_REGISTRY_IMAGE}/${ARCH}/gnome:${BRANCH}"
           echo "Building $TAG"
@@ -111,14 +132,6 @@ flat-manager-client:aarch64:
           if [ $CI_COMMIT_REF_NAME == master ]; then
               echo "Pushing $TAG"
               buildah push $TAG
-
-              # This is for backwards compatibility
-              if [ $ARCH == "x86_64" ]; then
-                  # Tag `x86_64` also without the ARCH to not break the old path
-                  export TAG_OLD="${CI_REGISTRY_IMAGE}/gnome:${BRANCH}"
-                  buildah tag $TAG $TAG_OLD
-                  buildah push $TAG_OLD
-              fi
           fi
 
 .vars_aarch64:
@@ -137,6 +150,7 @@ flat-manager-client:aarch64:
 .vars_nightly:
   variables:
     BRANCH: master
+    REGISTRY_TAG: 'gnome:master'
     FD_BRANCH: "22.08beta"
     LLVM_VERSION: "14"
     LLVM_VERSION_2: "14"
@@ -151,6 +165,7 @@ flat-manager-client:aarch64:
 .vars_41:
   variables:
     BRANCH: "41"
+    REGISTRY_TAG: 'gnome:41'
     FD_BRANCH: "21.08"
     LLVM_VERSION: "12"
     LLVM_VERSION_2: "13"
@@ -163,6 +178,7 @@ flat-manager-client:aarch64:
 .vars_42:
   variables:
     BRANCH: "42"
+    REGISTRY_TAG: 'gnome:42'
     FD_BRANCH: "21.08"
     LLVM_VERSION: "12"
     LLVM_VERSION_2: "13"
@@ -191,3 +207,15 @@ gnome:aarch64:nightly:
 gnome:aarch64:42:
   stage: 'runtimes'
   extends: ['.sdk_template', '.vars_42', '.vars_aarch64']
+
+gnome-manifest:nightly:
+  extends: ['.manifest', '.vars_nightly']
+  needs:
+    - gnome:nightly
+    - gnome:aarch64:nightly
+
+gnome-manifest:42:
+  extends: ['.manifest', '.vars_42']
+  needs:
+    - gnome:42
+    - gnome:aarch64:42
