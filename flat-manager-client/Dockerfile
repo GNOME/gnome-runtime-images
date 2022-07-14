@@ -1,4 +1,4 @@
-FROM registry.fedoraproject.org/fedora:latest
+FROM registry.fedoraproject.org/fedora-toolbox:36
 
 VOLUME /build
 WORKDIR /build
