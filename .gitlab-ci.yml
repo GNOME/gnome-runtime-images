@@ -68,7 +68,7 @@ base:
     stage: base
     extends: ['.dockerfile_template', '.vars_x86_64']
     variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/${ARCH}-base
+        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}:${ARCH}-base
         DOCKERFILE: Dockerfile
 
 base:aarch64:
