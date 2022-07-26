@@ -10,6 +10,7 @@ variables:
     STORAGE_DRIVER: 'vfs'
     BUILDAH_FORMAT: 'docker'
     BUILDAH_ISOLATION: 'chroot'
+    CI_REGISTRY_IMAGE: quay.io/gnome_infrastructure/gnome-runtime-images
 
 stages:
     - base
@@ -34,6 +35,7 @@ default:
         # push only on master branch
         - |
           if [ $CI_COMMIT_REF_NAME == master ]; then
+              buildah login -u ${OCI_REGISTRY_USER} -p ${OCI_REGISTRY_PASSWORD} quay.io
               buildah push ${DOCKERIMAGE}
           fi
     after_script:
@@ -56,23 +58,24 @@ default:
     - |
       buildah manifest create ${REGISTRY_TAG}
 
-      buildah manifest add ${REGISTRY_TAG} docker://${CI_REGISTRY_IMAGE}/x86_64/${REGISTRY_TAG};
-      buildah manifest add ${REGISTRY_TAG} docker://${CI_REGISTRY_IMAGE}/aarch64/${REGISTRY_TAG};
+      buildah manifest add ${REGISTRY_TAG} docker://${CI_REGISTRY_IMAGE}:x86_64-${REGISTRY_TAG};
+      buildah manifest add ${REGISTRY_TAG} docker://${CI_REGISTRY_IMAGE}:aarch64-${REGISTRY_TAG};
 
-      buildah manifest push --all ${REGISTRY_TAG} docker://${CI_REGISTRY_IMAGE}/${REGISTRY_TAG}
+      buildah login -u ${OCI_REGISTRY_USER} -p ${OCI_REGISTRY_PASSWORD} quay.io
+      buildah manifest push --all ${REGISTRY_TAG} docker://${CI_REGISTRY_IMAGE}:${REGISTRY_TAG}
 
 base:
     stage: base
     extends: ['.dockerfile_template', '.vars_x86_64']
     variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/${ARCH}/base
+        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/${ARCH}-base
         DOCKERFILE: Dockerfile
 
 base:aarch64:
     stage: base
     extends: ['.dockerfile_template', '.vars_aarch64']
     variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/${ARCH}/base
+        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}:${ARCH}-base
         DOCKERFILE: Dockerfile
 
 base-manifest:
@@ -87,14 +90,14 @@ flat-manager-client:
     stage: base
     extends: ['.dockerfile_template', '.vars_x86_64']
     variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/${ARCH}/flat-manager-client
+        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}:${ARCH}-flat-manager-client
         DOCKERFILE: flat-manager-client/Dockerfile
 
 flat-manager-client:aarch64:
     stage: base
     extends: ['.dockerfile_template', '.vars_aarch64']
     variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}/${ARCH}/flat-manager-client
+        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}:${ARCH}-flat-manager-client
         DOCKERFILE: flat-manager-client/Dockerfile
 
 flat-manager-client-manifest:
@@ -112,9 +115,9 @@ flat-manager-client-manifest:
     script:
         # build the flatpak sdk image
         - |
-          CONTAINER=$(buildah from ${CI_REGISTRY_IMAGE}/base)
+          CONTAINER=$(buildah from ${CI_REGISTRY_IMAGE}:base)
 
-          export TAG="${CI_REGISTRY_IMAGE}/${ARCH}/gnome:${BRANCH}"
+          export TAG="${CI_REGISTRY_IMAGE}:${ARCH}-gnome-${BRANCH}"
           echo "Building $TAG"
 
           buildah run $CONTAINER flatpak install --user --noninteractive \
@@ -148,14 +151,13 @@ flat-manager-client-manifest:
 .vars_x86_64:
   tags:
     - x86_64
-    - crun
   variables:
     ARCH: x86_64
 
 .vars_nightly:
   variables:
     BRANCH: master
-    REGISTRY_TAG: 'gnome:master'
+    REGISTRY_TAG: 'gnome-master'
     FD_BRANCH: "22.08beta"
     LLVM_VERSION: "14"
     LLVM_VERSION_2: "14"
@@ -170,7 +172,7 @@ flat-manager-client-manifest:
 .vars_41:
   variables:
     BRANCH: "41"
-    REGISTRY_TAG: 'gnome:41'
+    REGISTRY_TAG: 'gnome-41'
     FD_BRANCH: "21.08"
     LLVM_VERSION: "12"
     LLVM_VERSION_2: "13"
@@ -183,7 +185,7 @@ flat-manager-client-manifest:
 .vars_42:
   variables:
     BRANCH: "42"
-    REGISTRY_TAG: 'gnome:42'
+    REGISTRY_TAG: 'gnome-42'
     FD_BRANCH: "21.08"
     LLVM_VERSION: "12"
     LLVM_VERSION_2: "13"
