@@ -149,8 +149,6 @@ flat-manager-client-manifest:
     ARCH: aarch64
 
 .vars_x86_64:
-  tags:
-    - x86_64
   variables:
     ARCH: x86_64
 
