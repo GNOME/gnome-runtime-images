@@ -139,6 +139,7 @@ flat-manager-client-manifest:
         - |
           if [ $CI_COMMIT_REF_NAME == master ]; then
               echo "Pushing $TAG"
+              buildah login -u ${OCI_REGISTRY_USER} -p ${OCI_REGISTRY_PASSWORD} quay.io
               buildah push $TAG
           fi
 
