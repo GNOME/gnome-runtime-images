@@ -86,28 +86,6 @@ base-manifest:
     - base
     - base:aarch64
 
-flat-manager-client:
-    stage: base
-    extends: ['.dockerfile_template', '.vars_x86_64']
-    variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}:${ARCH}-flat-manager-client
-        DOCKERFILE: flat-manager-client/Dockerfile
-
-flat-manager-client:aarch64:
-    stage: base
-    extends: ['.dockerfile_template', '.vars_aarch64']
-    variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}:${ARCH}-flat-manager-client
-        DOCKERFILE: flat-manager-client/Dockerfile
-
-flat-manager-client-manifest:
-  extends: ['.manifest']
-  variables:
-    REGISTRY_TAG: 'flat-manager-client'
-  needs:
-    - flat-manager-client
-    - flat-manager-client:aarch64
-
 # Expects ${BRANCH} and ${FD_BRANCH} variables which are the gnome branch and the freedesktop-sdk
 # branch it is based on
 .sdk_template:
