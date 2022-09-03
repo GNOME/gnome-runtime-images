@@ -157,7 +157,7 @@ flat-manager-client-manifest:
   variables:
     BRANCH: master
     REGISTRY_TAG: 'gnome-master'
-    FD_BRANCH: "22.08beta"
+    FD_BRANCH: "22.08"
     LLVM_VERSION: "14"
     LLVM_VERSION_2: "14"
   rules:
