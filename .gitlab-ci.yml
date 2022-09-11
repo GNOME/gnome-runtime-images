@@ -1,4 +1,4 @@
-image: quay.io/buildah/stable:v1.26
+image: quay.io/buildah/stable:latest
 
 workflow:
   rules:
