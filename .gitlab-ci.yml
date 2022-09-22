@@ -146,19 +146,6 @@ base-manifest:
     - when: 'manual'
       allow_failure: true
 
-.vars_41:
-  variables:
-    BRANCH: "41"
-    REGISTRY_TAG: 'gnome-41'
-    FD_BRANCH: "21.08"
-    LLVM_VERSION: "12"
-    LLVM_VERSION_2: "13"
-  rules:
-    - if: '$REBUILD_STABLE'
-      when: 'always'
-    - when: 'manual'
-      allow_failure: true
-
 .vars_42:
   variables:
     BRANCH: "42"
@@ -188,10 +175,6 @@ base-manifest:
 gnome:nightly:
   stage: 'runtimes'
   extends: ['.sdk_template', '.vars_nightly', '.vars_x86_64']
-
-gnome:41:
-  stage: 'runtimes'
-  extends: ['.sdk_template', '.vars_41', '.vars_x86_64']
 
 gnome:42:
   stage: 'runtimes'
