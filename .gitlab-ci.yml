@@ -178,7 +178,7 @@ base-manifest:
 .vars_44:
   variables:
     BRANCH: "44"
-    REGISTRY_TAG: 'gnome-42'
+    REGISTRY_TAG: 'gnome-44'
     FD_BRANCH: "22.08"
     LLVM_VERSION: "14"
     LLVM_VERSION_2: "15"
