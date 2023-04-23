@@ -36,6 +36,9 @@ def rewrite_json_manifest(args):
                 new_sources.add_element(Json.from_string('{"type": "dir", "path": "%s"}' % path))
 
             mod.set_array_member('sources', new_sources)
+                        
+            if args.run_tests is not None:
+                mod.set_boolean_member('run-tests', args.run_tests)
 
             if args.config_opt:
                 newconfig = Json.Array.sized_new(len(args.config_opt))
@@ -61,6 +64,9 @@ def rewrite_yaml_manifest(args):
                 path = os.path.relpath('.', os.path.dirname(args.flatpak_manifest))
                 mod['sources'][i] = {'type': 'dir', 'path': path}
 
+                if args.run_tests is not None:
+                    mod['config-opts'] = args.run_tests
+
                 if args.config_opt:
                     mod['config-opts'] = args.config_opt
 
@@ -72,6 +78,7 @@ if __name__ == '__main__':
     parser.add_argument('flatpak_manifest', help='filename of the flatpak manifest (JSON or YAML)')
     parser.add_argument('module_name', help='name of the main module in the manifest')
     parser.add_argument('config_opt', nargs='*', help='replacement values for config-opts of main module')
+    parser.add_argument('--run-tests', action=argparse.BooleanOptionalAction, help='replace run-tests value of main module')
 
     args = parser.parse_args()
     if args.flatpak_manifest.endswith('.json'):
