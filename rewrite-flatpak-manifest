@@ -64,11 +64,11 @@ def rewrite_yaml_manifest(args):
                 path = os.path.relpath('.', os.path.dirname(args.flatpak_manifest))
                 mod['sources'][i] = {'type': 'dir', 'path': path}
 
-                if args.run_tests is not None:
-                    mod['config-opts'] = args.run_tests
+            if args.run_tests is not None:
+                mod['run-tests'] = args.run_tests
 
-                if args.config_opt:
-                    mod['config-opts'] = args.config_opt
+            if args.config_opt:
+                mod['config-opts'] = args.config_opt
 
     with open(args.flatpak_manifest, 'w') as f:
         yaml.round_trip_dump(data, f)
