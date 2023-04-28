@@ -94,6 +94,10 @@ base-manifest:
     needs: []
     script:
         # build the flatpak sdk image
+
+        # FIXME: install again after https://gitlab.gnome.org/GNOME/vala/-/merge_requests/323
+        # buildah run $CONTAINER flatpak install --user --noninteractive \
+        #           org.freedesktop.Sdk.Extension.vala-nightly//${FD_BRANCH}
         - |
           CONTAINER=$(buildah from ${CI_REGISTRY_IMAGE}:base)
 
@@ -117,9 +121,6 @@ base-manifest:
 
           buildah run $CONTAINER flatpak install --user --noninteractive \
                     org.freedesktop.Sdk.Extension.vala//${FD_BRANCH}
-
-          buildah run $CONTAINER flatpak install --user --noninteractive \
-                    org.freedesktop.Sdk.Extension.vala-nightly//${FD_BRANCH}
 
           buildah run $CONTAINER flatpak info --user org.gnome.Platform//${BRANCH}
           buildah run $CONTAINER flatpak info --user org.gnome.Sdk//${BRANCH}
@@ -149,9 +150,9 @@ base-manifest:
   variables:
     BRANCH: master
     REGISTRY_TAG: 'gnome-master'
-    FD_BRANCH: "22.08"
-    LLVM_VERSION: "14"
-    LLVM_VERSION_2: "15"
+    FD_BRANCH: "23.08beta"
+    LLVM_VERSION: "16"
+    LLVM_VERSION_2: "16"
   rules:
     - if: "$CI_MERGE_REQUEST_ID"
       when: 'always'
