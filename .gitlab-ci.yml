@@ -107,6 +107,9 @@ base-manifest:
                     org.freedesktop.Sdk.Extension.rust-stable//${FD_BRANCH}
 
           buildah run $CONTAINER flatpak install --user --noninteractive \
+                    org.freedesktop.Sdk//${FD_BRANCH}
+
+          buildah run $CONTAINER flatpak install --user --noninteractive \
                     org.freedesktop.Sdk.Extension.llvm${LLVM_VERSION}//${FD_BRANCH}
 
           buildah run $CONTAINER flatpak install --user --noninteractive \
