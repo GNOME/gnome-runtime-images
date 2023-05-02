@@ -116,7 +116,7 @@ base-manifest:
                     org.freedesktop.Sdk.Extension.vala//${FD_BRANCH}
 
           echo "Commiting $TAG"
-          buildah commit $CONTAINER $TAG
+          buildah commit --squash $CONTAINER $TAG
 
         # push only on master branch
         - |
