@@ -157,19 +157,6 @@ base-manifest:
     - when: 'manual'
       allow_failure: true
 
-.vars_42:
-  variables:
-    BRANCH: "42"
-    REGISTRY_TAG: 'gnome-42'
-    FD_BRANCH: "21.08"
-    LLVM_VERSION: "12"
-    LLVM_VERSION_2: "13"
-  rules:
-    - if: '$REBUILD_STABLE'
-      when: 'always'
-    - when: 'manual'
-      allow_failure: true
-
 .vars_43:
   variables:
     BRANCH: "43"
@@ -200,10 +187,6 @@ gnome:nightly:
   stage: 'runtimes'
   extends: ['.sdk_template', '.vars_nightly', '.vars_x86_64']
 
-gnome:42:
-  stage: 'runtimes'
-  extends: ['.sdk_template', '.vars_42', '.vars_x86_64']
-
 gnome:43:
   stage: 'runtimes'
   extends: ['.sdk_template', '.vars_43', '.vars_x86_64']
@@ -215,10 +198,6 @@ gnome:44:
 gnome:aarch64:nightly:
   stage: 'runtimes'
   extends: ['.sdk_template', '.vars_nightly', '.vars_aarch64']
-
-gnome:aarch64:42:
-  stage: 'runtimes'
-  extends: ['.sdk_template', '.vars_42', '.vars_aarch64']
 
 gnome:aarch64:43:
   stage: 'runtimes'
@@ -233,12 +212,6 @@ gnome-manifest:nightly:
   needs:
     - gnome:nightly
     - gnome:aarch64:nightly
-
-gnome-manifest:42:
-  extends: ['.manifest', '.vars_42']
-  needs:
-    - gnome:42
-    - gnome:aarch64:42
 
 gnome-manifest:43:
   extends: ['.manifest', '.vars_43']
