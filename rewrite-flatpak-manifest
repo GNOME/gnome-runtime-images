@@ -13,6 +13,38 @@ import os, sys
 
 from contextlib import contextmanager
 
+
+def set_json_test_args(mod):
+    gtk_ally_element = Json.from_string('"--env=GTK_A11Y=none"')
+    no_at_bridge_element = Json.from_string('"--env=NO_AT_SPI=1"')
+
+    default_test_args = Json.Array()
+    default_test_args.add_element(gtk_ally_element)
+    default_test_args.add_element(no_at_bridge_element)
+    default_test_args_member = Json.Object.new()
+    default_test_args_member.set_array_member("test-args", default_test_args)
+    default_test_args_node = Json.Node.new(Json.NodeType.OBJECT)
+    default_test_args_node.set_object(default_test_args_member)
+
+    if not mod.has_member("build-options"):
+        mod.set_member("build-options", default_test_args_node)
+
+    bopts = mod.get_member("build-options")
+    if not bopts.get_object().has_member("test-args"):
+        bopts.get_object().set_array_member("test-args", default_test_args)
+
+    test_args = bopts.get_object().get_array_member("test-args")
+
+    elements = test_args.get_elements()
+    elements_values = [element.get_value() for element in elements]
+
+    if "--env=GTK_A11Y=none" not in elements_values:
+        test_args.add_element(gtk_ally_element)
+
+    if "--env=NO_AT_SPI=1" not in elements_values:
+        test_args.add_element(no_at_bridge_element)
+
+
 def rewrite_json_manifest(args):
     with open(args.flatpak_manifest) as f:
         data = Json.from_string(f.read())
@@ -36,9 +68,10 @@ def rewrite_json_manifest(args):
                 new_sources.add_element(Json.from_string('{"type": "dir", "path": "%s"}' % path))
 
             mod.set_array_member('sources', new_sources)
-                        
+
             if args.run_tests is not None:
                 mod.set_boolean_member('run-tests', args.run_tests)
+                set_json_test_args(mod)
 
             if args.config_opt:
                 newconfig = Json.Array.sized_new(len(args.config_opt))
@@ -48,6 +81,28 @@ def rewrite_json_manifest(args):
 
     with open(args.flatpak_manifest, 'w') as f:
         f.write(Json.to_string(data, True))
+
+
+def set_yaml_test_args(mod):
+    gtk_ally = "--env=GTK_A11Y=none"
+    no_at_bridge = "--env=NO_AT_SPI=1"
+    default_test_args = [gtk_ally, no_at_bridge]
+    default_build_opts = { "test-args": default_test_args }
+
+    if not mod.get("build-options"):
+        mod["build-options"] = default_build_opts
+
+    if not mod["build-options"].get("test-args"):
+        mod["build-options"]["test-args"] = default_test_args
+
+    test_args = mod["build-options"]["test-args"]
+
+    if gtk_ally not in test_args:
+        test_args.append(gtk_ally)
+
+    if no_at_bridge not in test_args:
+        test_args.append(no_at_bridge)
+
 
 def rewrite_yaml_manifest(args):
     with open(args.flatpak_manifest) as f:
@@ -66,6 +121,7 @@ def rewrite_yaml_manifest(args):
 
             if args.run_tests is not None:
                 mod['run-tests'] = args.run_tests
+                set_yaml_test_args(mod)
 
             if args.config_opt:
                 mod['config-opts'] = args.config_opt
