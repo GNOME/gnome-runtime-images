@@ -138,6 +138,7 @@ base-manifest:
 .vars_aarch64:
   tags:
     - aarch64
+    - gnome-build-meta
   variables:
     ARCH: aarch64
 
