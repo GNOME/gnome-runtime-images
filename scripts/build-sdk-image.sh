@@ -2,7 +2,7 @@
 
 # build the flatpak sdk image
 #
-# Explicitly specify the repo to install nightly and 44 runtimes
+# Explicitly specify the repo to install nightly and 44,45 runtimes
 # Workaround https://github.com/flathub/flathub/issues/4452
 CONTAINER=$(buildah from "${CI_REGISTRY_IMAGE}:base")
 
@@ -12,7 +12,7 @@ echo "Building $TAG"
 if [ "$BRANCH" = "master" ]; then
     buildah run "$CONTAINER" flatpak install gnome-nightly --user --noninteractive \
     "org.gnome.Sdk//${BRANCH}" "org.gnome.Platform//${BRANCH}"
-    elif [ "$BRANCH" = "44" ]; then
+    elif [ "$BRANCH" = "44" ] || [ "$BRANCH" = "45" ]; then
     buildah run "$CONTAINER" flatpak install flathub --user --noninteractive \
     "org.gnome.Sdk//${BRANCH}" "org.gnome.Platform//${BRANCH}"
 else
