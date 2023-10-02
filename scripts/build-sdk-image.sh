@@ -1,5 +1,7 @@
 #! /bin/bash
 
+set -eu
+
 # build the flatpak sdk image
 #
 # Explicitly specify the repo to install nightly and 44,45 runtimes
