@@ -1,4 +1,4 @@
-FROM fedora:38
+FROM fedora:39
 
 RUN dnf upgrade -y --best --allowerasing && dnf install -y git 'dnf-command(builddep)' libtool \
         automake gettext-devel autoconf && \
@@ -11,7 +11,7 @@ RUN git clone --recursive https://github.com/alatiera/flatpak-builder -b alatier
     cd flatpak-builder && \
     ./autogen.sh --with-system-debugedit && make -j$(nproc)
 
-FROM fedora:38
+FROM fedora:39
 COPY --from=0 /flatpak-builder/flatpak-builder /usr/local/bin/flatpak-builder
 
 ENV FLATPAK_GL_DRIVERS=dummy
