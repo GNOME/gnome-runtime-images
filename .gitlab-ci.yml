@@ -94,7 +94,7 @@ base-manifest:
     REGISTRY_TAG: 'gnome-master'
     FD_BRANCH: "23.08"
     LLVM_VERSION: "16"
-    LLVM_VERSION_2: "16"
+    LLVM_VERSION_2: "18"
   rules:
     - if: "$CI_MERGE_REQUEST_ID"
       when: 'always'
@@ -122,7 +122,7 @@ base-manifest:
     REGISTRY_TAG: 'gnome-45'
     FD_BRANCH: "23.08"
     LLVM_VERSION: "16"
-    LLVM_VERSION_2: "16"
+    LLVM_VERSION_2: "18"
   rules:
     - if: '$REBUILD_STABLE'
       when: 'always'
@@ -135,7 +135,7 @@ base-manifest:
     REGISTRY_TAG: 'gnome-46'
     FD_BRANCH: "23.08"
     LLVM_VERSION: "16"
-    LLVM_VERSION_2: "16"
+    LLVM_VERSION_2: "18"
   rules:
     - if: '$REBUILD_STABLE'
       when: 'always'
