@@ -1,7 +1,7 @@
 FROM fedora:40
 
 RUN dnf upgrade -y --best --allowerasing && dnf install -y git 'dnf-command(builddep)' libtool \
-        automake gettext-devel autoconf && \
+        automake gettext-devel autoconf which && \
     dnf builddep -y flatpak-builder && \
     dnf groupinstall -y "Development Tools"
 
