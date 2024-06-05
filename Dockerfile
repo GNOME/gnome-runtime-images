@@ -1,15 +1,24 @@
-FROM quay.io/fedora/fedora:40
+# F40 gcc doesn't like compiling the flatpak 1.15.4 branch
+FROM quay.io/fedora/fedora:39
 
 RUN dnf upgrade -y --best --allowerasing && dnf install -y git 'dnf-command(builddep)' libtool \
-        automake gettext-devel autoconf which && \
-    dnf builddep -y flatpak-builder && \
+        automake gettext-devel autoconf which meson bzip2 && \
+    dnf builddep -y flatpak-builder flatpak && \
     dnf groupinstall -y "Development Tools"
+
+RUN git clone --recursive https://github.com/flatpak/flatpak.git && \
+    cd flatpak && \
+    git checkout 1.15.4 && \
+    git submodule sync --recursive && git submodule update --init --recursive && \
+    meson setup _build -Dtests=false -Dwerror=false && meson compile -C _build && \
+    meson install --destdir=dest -C _build
 
 RUN git clone --recursive https://github.com/flatpak/flatpak-builder -b barthalion/run-without-fuse-rebased && \
     cd flatpak-builder && \
     ./autogen.sh --with-system-debugedit && make -j$(nproc)
 
-FROM quay.io/fedora/fedora:40
+FROM quay.io/fedora/fedora:39
+COPY --from=0 /flatpak/_build/dest/usr/local /usr/local/
 COPY --from=0 /flatpak-builder/flatpak-builder /usr/local/bin/flatpak-builder
 
 ENV FLATPAK_GL_DRIVERS=dummy
@@ -22,6 +31,9 @@ RUN dnf upgrade -y --best --allowerasing && \
     dconf dbus-daemon dbus-tools git bzr xorg-x11-server-Xvfb dbus-x11 python3-ruamel-yaml \
     python3-gobject python3-pip json-glib jq tracker tracker-miners strace && \
     dnf clean all
+
+RUN which bwrap && which flatpak && which flatpak-builder
+RUN flatpak --version && flatpak-builder --version && bwrap --version
 
 # generate machine-id as specified in the freedesktop spec:
 # https://www.freedesktop.org/software/systemd/man/machine-id.html
