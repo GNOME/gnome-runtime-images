@@ -20,7 +20,7 @@ WORKDIR /build
 RUN dnf upgrade -y --best --allowerasing && \
     dnf install -y flatpak flatpak-builder librsvg2 ostree fuse elfutils ccache debugedit \
     dconf dbus-daemon dbus-tools git bzr xorg-x11-server-Xvfb dbus-x11 python3-ruamel-yaml \
-    python3-gobject python3-pip json-glib jq tracker tracker-miners && \
+    python3-gobject python3-pip json-glib jq tracker tracker-miners strace && \
     dnf clean all
 
 # generate machine-id as specified in the freedesktop spec:
