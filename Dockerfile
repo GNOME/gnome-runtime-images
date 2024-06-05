@@ -1,17 +1,15 @@
-FROM fedora:38
+FROM quay.io/fedora/fedora:40
 
 RUN dnf upgrade -y --best --allowerasing && dnf install -y git 'dnf-command(builddep)' libtool \
         automake gettext-devel autoconf which && \
     dnf builddep -y flatpak-builder && \
     dnf groupinstall -y "Development Tools"
 
-# FIXME: this is a rebased branch cause Bart is on vacation atm.
-# RUN git clone --recursive https://github.com/flatpak/flatpak-builder -b run-without-fuse && \
-RUN git clone --recursive https://github.com/alatiera/flatpak-builder -b alatiera/run-without-fuse-rebased && \
+RUN git clone --recursive https://github.com/flatpak/flatpak-builder -b barthalion/run-without-fuse-rebased && \
     cd flatpak-builder && \
     ./autogen.sh --with-system-debugedit && make -j$(nproc)
 
-FROM fedora:38
+FROM quay.io/fedora/fedora:40
 COPY --from=0 /flatpak-builder/flatpak-builder /usr/local/bin/flatpak-builder
 
 ENV FLATPAK_GL_DRIVERS=dummy
@@ -36,4 +34,4 @@ USER build
 
 RUN flatpak remote-add --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo && \
     flatpak remote-add --user gnome-nightly https://nightly.gnome.org/gnome-nightly.flatpakrepo && \
-    flatpak remote-add --user flathub-beta https://flathub.org/beta-repo/flathub-beta.flatpakrepo
+    flatpak remote-add --user flathub-beta https://dl.flathub.org/beta-repo/flathub-beta.flatpakrepo
