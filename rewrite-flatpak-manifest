@@ -105,8 +105,11 @@ def set_yaml_test_args(mod):
 
 
 def rewrite_yaml_manifest(args):
+    yaml_parser = yaml.YAML()
+    yaml_parser.preserve_quotes = True
+
     with open(args.flatpak_manifest) as f:
-        data = yaml.round_trip_load(f, preserve_quotes=True)
+        data = yaml_parser.load(f)
 
     for mod in data['modules']:
         if not isinstance(mod, dict):
@@ -127,7 +130,7 @@ def rewrite_yaml_manifest(args):
                 mod['config-opts'] = args.config_opt
 
     with open(args.flatpak_manifest, 'w') as f:
-        yaml.round_trip_dump(data, f)
+        yaml_parser.dump(data, f)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Prepare a flatpak manifest for CI execution')
