@@ -1,4 +1,4 @@
-FROM quay.io/fedora/fedora:40
+FROM quay.io/fedora/fedora:39
 
 RUN dnf upgrade -y --best --allowerasing && dnf install -y git 'dnf-command(builddep)' libtool \
         automake gettext-devel autoconf which meson bzip2 && \
@@ -14,7 +14,7 @@ RUN git clone --recursive https://github.com/flatpak/flatpak-builder -b barthali
     cd flatpak-builder && \
     ./autogen.sh --with-system-debugedit && make -j$(nproc)
 
-FROM quay.io/fedora/fedora:40
+FROM quay.io/fedora/fedora:39
 COPY --from=0 /flatpak/destdir/usr/local /usr/local/
 COPY --from=0 /flatpak-builder/flatpak-builder /usr/local/bin/flatpak-builder
 
