@@ -92,8 +92,8 @@ base-manifest:
   variables:
     BRANCH: master
     REGISTRY_TAG: 'gnome-master'
-    FD_BRANCH: "23.08"
-    LLVM_VERSION: "16"
+    FD_BRANCH: "24.08beta"
+    LLVM_VERSION: "18"
     LLVM_VERSION_2: "18"
   rules:
     - if: "$CI_MERGE_REQUEST_ID"
