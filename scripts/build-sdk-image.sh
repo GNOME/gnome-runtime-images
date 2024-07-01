@@ -37,8 +37,8 @@ buildah run "$CONTAINER" flatpak install --user --noninteractive \
 buildah run "$CONTAINER" flatpak install --user --noninteractive \
     "org.freedesktop.Sdk.Extension.vala//${FD_BRANCH}"
 
-# buildah run $CONTAINER flatpak install --user --noninteractive \
-#     "org.freedesktop.Sdk.Extension.vala-nightly//${FD_BRANCH}"
+buildah run $CONTAINER flatpak install --user --noninteractive \
+    "org.freedesktop.Sdk.Extension.vala-nightly//${FD_BRANCH}"
 
 buildah run "$CONTAINER" flatpak info --user "org.gnome.Platform//${BRANCH}"
 buildah run "$CONTAINER" flatpak info --user "org.gnome.Sdk//${BRANCH}"
