@@ -22,6 +22,15 @@ else
         "org.gnome.Sdk//${BRANCH}" "org.gnome.Platform//${BRANCH}"
 fi
 
+if [[ "$FD_BRANCH" == *beta ]]; then
+    buildah run "$CONTAINER" flatpak install flathub-beta --user --noninteractive \
+        "org.freedesktop.Platform.GL.default//${FD_BRANCH}"
+else
+    buildah run "$CONTAINER" flatpak install flathub --user --noninteractive \
+        "org.freedesktop.Platform.GL.default//${FD_BRANCH}"
+fi
+
+
 buildah run "$CONTAINER" flatpak install --user --noninteractive \
     "org.freedesktop.Sdk.Extension.rust-stable//${FD_BRANCH}"
 

@@ -18,8 +18,6 @@ FROM quay.io/fedora/fedora:39
 COPY --from=0 /flatpak/destdir/usr/local /usr/local/
 COPY --from=0 /flatpak-builder/flatpak-builder /usr/local/bin/flatpak-builder
 
-ENV FLATPAK_GL_DRIVERS=dummy
-
 RUN useradd --home-dir /build --create-home --shell /bin/bash build
 WORKDIR /build
 
