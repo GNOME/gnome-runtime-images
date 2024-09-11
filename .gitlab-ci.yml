@@ -92,7 +92,7 @@ base-manifest:
   variables:
     BRANCH: master
     REGISTRY_TAG: 'gnome-master'
-    FD_BRANCH: "24.08beta"
+    FD_BRANCH: "24.08"
     LLVM_VERSION: "18"
     LLVM_VERSION_2: "18"
   rules:
