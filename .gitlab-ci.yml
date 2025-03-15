@@ -2,70 +2,70 @@ image: quay.io/buildah/stable:latest
 
 workflow:
   rules:
-    - if: '$CI_COMMIT_TAG'
-    - if: '$CI_COMMIT_BRANCH'
+    - if: "$CI_COMMIT_TAG"
+    - if: "$CI_COMMIT_BRANCH"
 
 # Buildah can't use 'overlay' driver when running inside docker
 variables:
-    STORAGE_DRIVER: 'vfs'
-    BUILDAH_FORMAT: 'docker'
-    BUILDAH_ISOLATION: 'chroot'
-    CI_REGISTRY_IMAGE: quay.io/gnome_infrastructure/gnome-runtime-images
+  STORAGE_DRIVER: "vfs"
+  BUILDAH_FORMAT: "docker"
+  BUILDAH_ISOLATION: "chroot"
+  CI_REGISTRY_IMAGE: quay.io/gnome_infrastructure/gnome-runtime-images
 
 stages:
-    - base
-    - runtimes
-    - bundles
-    - manifests
+  - base
+  - runtimes
+  - bundles
+  - manifests
 
 default:
-    before_script:
-        - buildah login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
-    interruptible: true
-    retry: 1
+  before_script:
+    - buildah login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+  interruptible: true
+  retry: 1
 
 # Expects ${DOCKERIMAGE} which should be the name+tag of the registry image.
 # Expects ${DOCKERFILE} variable which should be the path to the Dockerfile.
 .dockerfile_template:
-    script:
-      - bash ./scripts/build-image.sh $REGISTRY_TAG
-    after_script:
-        # don't try to use systemd/journald
-        - |
-          cat >> /etc/containers/libpod.conf << END
-          cgroup_manager = "cgroupfs"
-          events_logger = "file"
-          END
-        # - podman run --rm ${DOCKERIMAGE} flatpak list --columns=application,branch,arch,active,size
-        - buildah inspect --format "{{.FromImageID}}" ${DOCKERIMAGE}
-    rules:
-      - when: 'manual'
-        allow_failure: true
+  script:
+    - bash ./scripts/build-image.sh $REGISTRY_TAG
+  after_script:
+    # don't try to use systemd/journald
+    - |
+      cat >> /etc/containers/libpod.conf << END
+      cgroup_manager = "cgroupfs"
+      events_logger = "file"
+      END
+    # - podman run --rm ${DOCKERIMAGE} flatpak list --columns=application,branch,arch,active,size
+    - buildah inspect --format "{{.FromImageID}}" ${DOCKERIMAGE}
+  rules:
+    - when: "manual"
+      allow_failure: true
 
 # Expects ${REGISTRY_TAG} which should be the name+tag of the manifest ref
 .manifest:
-  stage: 'manifests'
+  stage: "manifests"
   script:
     - bash ./scripts/make-manifest.sh $REGISTRY_TAG
 
 base:
-    stage: base
-    extends: ['.dockerfile_template', '.vars_x86_64']
-    variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}:${ARCH}-base
-        DOCKERFILE: Dockerfile
+  stage: base
+  extends: [".dockerfile_template", ".vars_x86_64"]
+  variables:
+    DOCKERIMAGE: ${CI_REGISTRY_IMAGE}:${ARCH}-base
+    DOCKERFILE: Dockerfile
 
 base:aarch64:
-    stage: base
-    extends: ['.dockerfile_template', '.vars_aarch64']
-    variables:
-        DOCKERIMAGE: ${CI_REGISTRY_IMAGE}:${ARCH}-base
-        DOCKERFILE: Dockerfile
+  stage: base
+  extends: [".dockerfile_template", ".vars_aarch64"]
+  variables:
+    DOCKERIMAGE: ${CI_REGISTRY_IMAGE}:${ARCH}-base
+    DOCKERFILE: Dockerfile
 
 base-manifest:
-  extends: ['.manifest']
+  extends: [".manifest"]
   variables:
-    REGISTRY_TAG: 'base'
+    REGISTRY_TAG: "base"
   needs:
     - base
     - base:aarch64
@@ -73,9 +73,9 @@ base-manifest:
 # Expects ${BRANCH} and ${FD_BRANCH} variables which are the gnome branch and the freedesktop-sdk
 # branch it is based on
 .sdk_template:
-    needs: []
-    script:
-      - bash ./scripts/build-sdk-image.sh
+  needs: []
+  script:
+    - bash ./scripts/build-sdk-image.sh
 
 .vars_aarch64:
   tags:
@@ -91,109 +91,109 @@ base-manifest:
 .vars_nightly:
   variables:
     BRANCH: master
-    REGISTRY_TAG: 'gnome-master'
+    REGISTRY_TAG: "gnome-master"
     FD_BRANCH: "24.08"
     LLVM_VERSION: "18"
     LLVM_VERSION_2: "18"
   rules:
     - if: "$CI_MERGE_REQUEST_ID"
-      when: 'always'
+      when: "always"
     - if: "$CI_COMMIT_BRANCH == 'master'"
-      when: 'always'
-    - when: 'manual'
+      when: "always"
+    - when: "manual"
       allow_failure: true
 
 .vars_45:
   variables:
     BRANCH: "45"
-    REGISTRY_TAG: 'gnome-45'
+    REGISTRY_TAG: "gnome-45"
     FD_BRANCH: "23.08"
     LLVM_VERSION: "16"
     LLVM_VERSION_2: "18"
   rules:
-    - if: '$REBUILD_STABLE'
-      when: 'always'
-    - when: 'manual'
+    - if: "$REBUILD_STABLE"
+      when: "always"
+    - when: "manual"
       allow_failure: true
 
 .vars_46:
   variables:
     BRANCH: "46"
-    REGISTRY_TAG: 'gnome-46'
+    REGISTRY_TAG: "gnome-46"
     FD_BRANCH: "23.08"
     LLVM_VERSION: "16"
     LLVM_VERSION_2: "18"
   rules:
-    - if: '$REBUILD_STABLE'
-      when: 'always'
-    - when: 'manual'
+    - if: "$REBUILD_STABLE"
+      when: "always"
+    - when: "manual"
       allow_failure: true
 
 .vars_47:
   variables:
     BRANCH: "47"
-    REGISTRY_TAG: 'gnome-47'
+    REGISTRY_TAG: "gnome-47"
     FD_BRANCH: "24.08"
     LLVM_VERSION: "18"
     LLVM_VERSION_2: "18"
   rules:
-    - if: '$REBUILD_STABLE'
-      when: 'always'
-    - when: 'manual'
+    - if: "$REBUILD_STABLE"
+      when: "always"
+    - when: "manual"
       allow_failure: true
 
 gnome:nightly:
-  stage: 'runtimes'
-  extends: ['.sdk_template', '.vars_nightly', '.vars_x86_64']
+  stage: "runtimes"
+  extends: [".sdk_template", ".vars_nightly", ".vars_x86_64"]
 
 gnome:45:
-  stage: 'runtimes'
-  extends: ['.sdk_template', '.vars_45', '.vars_x86_64']
+  stage: "runtimes"
+  extends: [".sdk_template", ".vars_45", ".vars_x86_64"]
 
 gnome:46:
-  stage: 'runtimes'
-  extends: ['.sdk_template', '.vars_46', '.vars_x86_64']
+  stage: "runtimes"
+  extends: [".sdk_template", ".vars_46", ".vars_x86_64"]
 
 gnome:47:
-  stage: 'runtimes'
-  extends: ['.sdk_template', '.vars_47', '.vars_x86_64']
+  stage: "runtimes"
+  extends: [".sdk_template", ".vars_47", ".vars_x86_64"]
 
 gnome:aarch64:nightly:
-  stage: 'runtimes'
-  extends: ['.sdk_template', '.vars_nightly', '.vars_aarch64']
+  stage: "runtimes"
+  extends: [".sdk_template", ".vars_nightly", ".vars_aarch64"]
 
 gnome:aarch64:45:
-  stage: 'runtimes'
-  extends: ['.sdk_template', '.vars_45', '.vars_aarch64']
+  stage: "runtimes"
+  extends: [".sdk_template", ".vars_45", ".vars_aarch64"]
 
 gnome:aarch64:46:
-  stage: 'runtimes'
-  extends: ['.sdk_template', '.vars_46', '.vars_aarch64']
+  stage: "runtimes"
+  extends: [".sdk_template", ".vars_46", ".vars_aarch64"]
 
 gnome:aarch64:47:
-  stage: 'runtimes'
-  extends: ['.sdk_template', '.vars_47', '.vars_aarch64']
+  stage: "runtimes"
+  extends: [".sdk_template", ".vars_47", ".vars_aarch64"]
 
 gnome-manifest:nightly:
-  extends: ['.manifest', '.vars_nightly']
+  extends: [".manifest", ".vars_nightly"]
   needs:
     - gnome:nightly
     - gnome:aarch64:nightly
 
 gnome-manifest:45:
-  extends: ['.manifest', '.vars_45']
+  extends: [".manifest", ".vars_45"]
   needs:
     - gnome:45
     - gnome:aarch64:45
 
 gnome-manifest:46:
-  extends: ['.manifest', '.vars_46']
+  extends: [".manifest", ".vars_46"]
   needs:
     - gnome:46
     - gnome:aarch64:46
 
 gnome-manifest:47:
-  extends: ['.manifest', '.vars_47']
+  extends: [".manifest", ".vars_47"]
   needs:
     - gnome:47
     - gnome:aarch64:47
