@@ -145,7 +145,7 @@ base-manifest:
 .vars_48:
   variables:
     BRANCH: "48"
-    REGISTRY_TAG: "gnome-46"
+    REGISTRY_TAG: "gnome-48"
     FD_BRANCH: "24.08"
     LLVM_VERSION: "18"
     LLVM_VERSION_2: "18"
