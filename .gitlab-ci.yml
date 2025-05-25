@@ -85,15 +85,3 @@ include:
       fdsdk-version: "24.08"
       llvm-version-1: "18"
       llvm-version-2: "18"
-  - component: $CI_SERVER_FQDN/$CI_PROJECT_PATH/build-image@$CI_COMMIT_SHA
-    inputs:
-      platform-version: "46"
-      fdsdk-version: "23.08"
-      llvm-version-1: "16"
-      llvm-version-2: "18"
-  - component: $CI_SERVER_FQDN/$CI_PROJECT_PATH/build-image@$CI_COMMIT_SHA
-    inputs:
-      platform-version: "45"
-      fdsdk-version: "23.08"
-      llvm-version-1: "16"
-      llvm-version-2: "18"
