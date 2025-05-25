@@ -9,7 +9,7 @@ spec:
     llvm-version-2:
       description: "Version of the .Extension.llvm to install"
 ---
-.common:
+".common:$[[ inputs.platform-version ]]":
   image: "quay.io/buildah/stable:latest"
   before_script:
     - buildah login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
@@ -23,21 +23,21 @@ spec:
     - when: "manual"
       allow_failure: true
 
-.sdk_template:
+".sdk_template:$[[ inputs.platform-version ]]":
   stage: "runtimes"
-  extends: ".common"
+  extends: ".common:$[[ inputs.platform-version ]]"
   after_script: []
   needs: []
   script:
     - bash ./scripts/build-sdk-image.sh "$[[ inputs.platform-version ]]" "$[[ inputs.fdsdk-version ]]" "$[[ inputs.llvm-version-1 ]]" "$[[ inputs.llvm-version-2 ]]"
 
 "gnome:$[[ inputs.platform-version ]]":
-  extends: ".sdk_template"
+  extends: ".sdk_template:$[[ inputs.platform-version ]]"
   variables:
     ARCH: x86_64
 
 "gnome:aarch64:$[[ inputs.platform-version ]]":
-  extends: ".sdk_template"
+  extends: ".sdk_template:$[[ inputs.platform-version ]]"
   tags:
     - aarch64
     - gnome-build-meta
@@ -45,8 +45,8 @@ spec:
     ARCH: aarch64
 
 "gnome-manifest:$[[ inputs.platform-version ]]":
-  extends: ".common"
   stage: "manifests"
+  extends: ".common:$[[ inputs.platform-version ]]"
   after_script: []
   needs:
     - "gnome:$[[ inputs.platform-version ]]"
