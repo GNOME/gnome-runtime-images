@@ -2,6 +2,11 @@
 
 set -eu
 
+BRANCH="$1"
+FD_BRANCH="$2"
+LLVM_VERSION="$3"
+LLVM_VERSION_2="$4"
+
 # build the flatpak sdk image
 #
 # Explicitly specify the repo to install nightly and 44,45 runtimes

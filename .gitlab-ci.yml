@@ -1,10 +1,3 @@
-image: quay.io/buildah/stable:latest
-
-workflow:
-  rules:
-    - if: "$CI_COMMIT_TAG"
-    - if: "$CI_COMMIT_BRANCH"
-
 # Buildah can't use 'overlay' driver when running inside docker
 variables:
   STORAGE_DRIVER: "vfs"
@@ -15,18 +8,14 @@ variables:
 stages:
   - base
   - runtimes
-  - bundles
   - manifests
-
-default:
-  before_script:
-    - buildah login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
-  interruptible: true
-  retry: 1
 
 # Expects ${DOCKERIMAGE} which should be the name+tag of the registry image.
 # Expects ${DOCKERFILE} variable which should be the path to the Dockerfile.
 .dockerfile_template:
+  image: "quay.io/buildah/stable:latest"
+  before_script:
+    - buildah login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
   script:
     - bash ./scripts/build-image.sh $REGISTRY_TAG
   after_script:
@@ -42,185 +31,69 @@ default:
     - when: "manual"
       allow_failure: true
 
-# Expects ${REGISTRY_TAG} which should be the name+tag of the manifest ref
-.manifest:
-  stage: "manifests"
-  script:
-    - bash ./scripts/make-manifest.sh $REGISTRY_TAG
-
 base:
   stage: base
-  extends: [".dockerfile_template", ".vars_x86_64"]
+  extends: ".dockerfile_template"
   variables:
+    ARCH: x86_64
     DOCKERIMAGE: ${CI_REGISTRY_IMAGE}:${ARCH}-base
     DOCKERFILE: Dockerfile
 
 base:aarch64:
   stage: base
-  extends: [".dockerfile_template", ".vars_aarch64"]
-  variables:
-    DOCKERIMAGE: ${CI_REGISTRY_IMAGE}:${ARCH}-base
-    DOCKERFILE: Dockerfile
-
-base-manifest:
-  extends: [".manifest"]
-  variables:
-    REGISTRY_TAG: "base"
-  needs:
-    - base
-    - base:aarch64
-
-# Expects ${BRANCH} and ${FD_BRANCH} variables which are the gnome branch and the freedesktop-sdk
-# branch it is based on
-.sdk_template:
-  needs: []
-  script:
-    - bash ./scripts/build-sdk-image.sh
-
-.vars_aarch64:
+  extends: ".dockerfile_template"
   tags:
     - aarch64
     - gnome-build-meta
   variables:
     ARCH: aarch64
+    DOCKERIMAGE: ${CI_REGISTRY_IMAGE}:${ARCH}-base
+    DOCKERFILE: Dockerfile
 
-.vars_x86_64:
+base-manifest:
+  image: "quay.io/buildah/stable:latest"
+  stage: "manifests"
   variables:
-    ARCH: x86_64
-
-.vars_nightly:
-  variables:
-    BRANCH: master
-    REGISTRY_TAG: "gnome-master"
-    FD_BRANCH: "24.08"
-    LLVM_VERSION: "18"
-    LLVM_VERSION_2: "18"
-  rules:
-    - if: "$CI_MERGE_REQUEST_ID"
-      when: "always"
-    - if: "$CI_COMMIT_BRANCH == 'master'"
-      when: "always"
-    - when: "manual"
-      allow_failure: true
-
-.vars_45:
-  variables:
-    BRANCH: "45"
-    REGISTRY_TAG: "gnome-45"
-    FD_BRANCH: "23.08"
-    LLVM_VERSION: "16"
-    LLVM_VERSION_2: "18"
-  rules:
-    - if: "$REBUILD_STABLE"
-      when: "always"
-    - when: "manual"
-      allow_failure: true
-
-.vars_46:
-  variables:
-    BRANCH: "46"
-    REGISTRY_TAG: "gnome-46"
-    FD_BRANCH: "23.08"
-    LLVM_VERSION: "16"
-    LLVM_VERSION_2: "18"
-  rules:
-    - if: "$REBUILD_STABLE"
-      when: "always"
-    - when: "manual"
-      allow_failure: true
-
-.vars_47:
-  variables:
-    BRANCH: "47"
-    REGISTRY_TAG: "gnome-47"
-    FD_BRANCH: "24.08"
-    LLVM_VERSION: "18"
-    LLVM_VERSION_2: "18"
-  rules:
-    - if: "$REBUILD_STABLE"
-      when: "always"
-    - when: "manual"
-      allow_failure: true
-
-.vars_48:
-  variables:
-    BRANCH: "48"
-    REGISTRY_TAG: "gnome-48"
-    FD_BRANCH: "24.08"
-    LLVM_VERSION: "18"
-    LLVM_VERSION_2: "18"
-  rules:
-    - if: "$REBUILD_STABLE"
-      when: "always"
-    - when: "manual"
-      allow_failure: true
-
-gnome:nightly:
-  stage: "runtimes"
-  extends: [".sdk_template", ".vars_nightly", ".vars_x86_64"]
-
-gnome:45:
-  stage: "runtimes"
-  extends: [".sdk_template", ".vars_45", ".vars_x86_64"]
-
-gnome:46:
-  stage: "runtimes"
-  extends: [".sdk_template", ".vars_46", ".vars_x86_64"]
-
-gnome:47:
-  stage: "runtimes"
-  extends: [".sdk_template", ".vars_47", ".vars_x86_64"]
-
-gnome:48:
-  stage: "runtimes"
-  extends: [".sdk_template", ".vars_48", ".vars_x86_64"]
-
-gnome:aarch64:nightly:
-  stage: "runtimes"
-  extends: [".sdk_template", ".vars_nightly", ".vars_aarch64"]
-
-gnome:aarch64:45:
-  stage: "runtimes"
-  extends: [".sdk_template", ".vars_45", ".vars_aarch64"]
-
-gnome:aarch64:46:
-  stage: "runtimes"
-  extends: [".sdk_template", ".vars_46", ".vars_aarch64"]
-
-gnome:aarch64:47:
-  stage: "runtimes"
-  extends: [".sdk_template", ".vars_47", ".vars_aarch64"]
-
-gnome:aarch64:48:
-  stage: "runtimes"
-  extends: [".sdk_template", ".vars_48", ".vars_aarch64"]
-
-gnome-manifest:nightly:
-  extends: [".manifest", ".vars_nightly"]
+    REGISTRY_TAG: "base"
+  before_script:
+    - buildah login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+  script:
+    - bash ./scripts/make-manifest.sh $REGISTRY_TAG
   needs:
-    - gnome:nightly
-    - gnome:aarch64:nightly
+    - base
+    - base:aarch64
 
-gnome-manifest:45:
-  extends: [".manifest", ".vars_45"]
-  needs:
-    - gnome:45
-    - gnome:aarch64:45
-
-gnome-manifest:46:
-  extends: [".manifest", ".vars_46"]
-  needs:
-    - gnome:46
-    - gnome:aarch64:46
-
-gnome-manifest:47:
-  extends: [".manifest", ".vars_47"]
-  needs:
-    - gnome:47
-    - gnome:aarch64:47
-
-gnome-manifest:48:
-  extends: [".manifest", ".vars_48"]
-  needs:
-    - gnome:48
-    - gnome:aarch64:48
+include:
+  - project: "gnome/citemplates"
+    file: "templates/default-rules.yml"
+  # include the component located in the current project from the current SHA
+  - component: $CI_SERVER_FQDN/$CI_PROJECT_PATH/build-image@$CI_COMMIT_SHA
+    inputs:
+      platform-version: "master"
+      fdsdk-version: "24.08"
+      llvm-version-1: "18"
+      llvm-version-2: "18"
+  - component: $CI_SERVER_FQDN/$CI_PROJECT_PATH/build-image@$CI_COMMIT_SHA
+    inputs:
+      platform-version: "48"
+      fdsdk-version: "24.08"
+      llvm-version-1: "18"
+      llvm-version-2: "18"
+  - component: $CI_SERVER_FQDN/$CI_PROJECT_PATH/build-image@$CI_COMMIT_SHA
+    inputs:
+      platform-version: "47"
+      fdsdk-version: "24.08"
+      llvm-version-1: "18"
+      llvm-version-2: "18"
+  - component: $CI_SERVER_FQDN/$CI_PROJECT_PATH/build-image@$CI_COMMIT_SHA
+    inputs:
+      platform-version: "46"
+      fdsdk-version: "23.08"
+      llvm-version-1: "16"
+      llvm-version-2: "18"
+  - component: $CI_SERVER_FQDN/$CI_PROJECT_PATH/build-image@$CI_COMMIT_SHA
+    inputs:
+      platform-version: "45"
+      fdsdk-version: "23.08"
+      llvm-version-1: "16"
+      llvm-version-2: "18"

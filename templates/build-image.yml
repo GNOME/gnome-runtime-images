@@ -1,0 +1,56 @@
+spec:
+  inputs:
+    platform-version:
+      description: "Version of the GNOME Platform to install"
+    fdsdk-version:
+      description: "Version of the FDSDK base"
+    llvm-version-1:
+      description: "Version of the .Extension.llvm to install"
+    llvm-version-2:
+      description: "Version of the .Extension.llvm to install"
+---
+.common:
+  image: "quay.io/buildah/stable:latest"
+  before_script:
+    - buildah login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+  rules:
+    - if: $CI_MERGE_REQUEST_ID && "$[[ inputs.platform-version ]]" == "master"
+      when: "always"
+    - if: $REBUILD_STABLE && "$[[ inputs.platform-version ]]" != "master"
+      when: "always"
+    - if: $CI_COMMIT_BRANCH == "master"
+      when: "always"
+    - when: "manual"
+      allow_failure: true
+
+.sdk_template:
+  stage: "runtimes"
+  extends: ".common"
+  after_script: []
+  needs: []
+  script:
+    - bash ./scripts/build-sdk-image.sh "$[[ inputs.platform-version ]]" "$[[ inputs.fdsdk-version ]]" "$[[ inputs.llvm-version-1 ]]" "$[[ inputs.llvm-version-2 ]]"
+
+"gnome:$[[ inputs.platform-version ]]":
+  extends: ".sdk_template"
+  variables:
+    ARCH: x86_64
+
+"gnome:aarch64:$[[ inputs.platform-version ]]":
+  extends: ".sdk_template"
+  tags:
+    - aarch64
+    - gnome-build-meta
+  variables:
+    ARCH: aarch64
+
+"gnome-manifest:$[[ inputs.platform-version ]]":
+  extends: ".common"
+  stage: "manifests"
+  after_script: []
+  needs:
+    - "gnome:$[[ inputs.platform-version ]]"
+    - "gnome:aarch64:$[[ inputs.platform-version ]]"
+# Expects ${REGISTRY_TAG} which should be the name+tag of the manifest ref
+  script:
+    - bash ./scripts/make-manifest.sh "gnome-$[[ inputs.platform-version ]]"
