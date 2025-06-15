@@ -59,13 +59,13 @@ def rewrite_json_manifest(args):
         if mod.get_string_member('name') == args.module_name:
             sources = mod.get_array_member('sources')
             new_sources = Json.Array()
-            for i in range(sources.get_length()):
-                if sources.get_object_element(i).get_string_member('type') != 'git':
-                    new_sources.add_object_element(sources.get_object_element(i))
-                    continue
-
+            if sources.get_object_element(0).get_string_member('type') == 'git':
+                sources.remove_element(0)
                 path = os.path.relpath('.', os.path.dirname(args.flatpak_manifest))
                 new_sources.add_element(Json.from_string('{"type": "dir", "path": "%s"}' % path))
+
+            for i in range(sources.get_length()):
+                new_sources.add_object_element(sources.get_object_element(i))
 
             mod.set_array_member('sources', new_sources)
 
@@ -116,11 +116,9 @@ def rewrite_yaml_manifest(args):
             continue
 
         if mod['name'] == args.module_name:
-            for i in range(len(mod['sources'])):
-                if mod['sources'][i]['type'] != 'git':
-                    continue
+            if mod['sources'][0]['type'] == 'git':
                 path = os.path.relpath('.', os.path.dirname(args.flatpak_manifest))
-                mod['sources'][i] = {'type': 'dir', 'path': path}
+                mod['sources'][0] = {'type': 'dir', 'path': path}
 
             if args.run_tests is not None:
                 mod['run-tests'] = args.run_tests
