@@ -27,9 +27,6 @@ fi
 if [ "$BRANCH" = "master" ]; then
     buildah run "$CONTAINER" flatpak install gnome-nightly --user --noninteractive \
         "org.gnome.Sdk//${BRANCH}" "org.gnome.Platform//${BRANCH}"
-elif [ "$BRANCH" = "44" ] || [ "$BRANCH" = "45" ]; then
-    buildah run "$CONTAINER" flatpak install flathub --user --noninteractive \
-        "org.gnome.Sdk//${BRANCH}" "org.gnome.Platform//${BRANCH}"
 else
     buildah run "$CONTAINER" flatpak install --user --noninteractive \
         "org.gnome.Sdk//${BRANCH}" "org.gnome.Platform//${BRANCH}"
