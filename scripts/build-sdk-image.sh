@@ -35,7 +35,7 @@ fi
 buildah run "$CONTAINER" flatpak install --user --noninteractive \
     "org.freedesktop.Sdk.Extension.llvm${LLVM_VERSION_2}//${FD_BRANCH}" \
     "org.freedesktop.Sdk.Extension.llvm${LLVM_VERSION}//${FD_BRANCH}" \
-    "org.freedesktop.Sdk.Extension.node20//${FD_BRANCH}" \
+    "org.freedesktop.Sdk.Extension.node24//${FD_BRANCH}" \
     "org.freedesktop.Sdk.Extension.rust-stable//${FD_BRANCH}" \
     "org.freedesktop.Sdk.Extension.typescript//${FD_BRANCH}" \
     "org.freedesktop.Sdk.Extension.vala//${FD_BRANCH}"
