@@ -49,7 +49,7 @@ buildah run "$CONTAINER" flatpak install --user --noninteractive \
 buildah run "$CONTAINER" flatpak info --user "org.gnome.Platform//${BRANCH}"
 buildah run "$CONTAINER" flatpak info --user "org.gnome.Sdk//${BRANCH}"
 
-echo "Commiting $TAG"
+echo "Committing $TAG"
 buildah commit --squash "$CONTAINER" "$TAG"
 
 # push only on master branch
