@@ -70,7 +70,7 @@ include:
   - component: $CI_SERVER_FQDN/$CI_PROJECT_PATH/build-image@$CI_COMMIT_SHA
     inputs:
       platform-version: "master"
-      fdsdk-version: "24.08"
+      fdsdk-version: "25.08beta"
       llvm-version-1: "18"
       llvm-version-2: "20"
   - component: $CI_SERVER_FQDN/$CI_PROJECT_PATH/build-image@$CI_COMMIT_SHA
