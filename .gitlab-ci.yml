@@ -72,16 +72,16 @@ include:
       platform-version: "master"
       fdsdk-version: "24.08"
       llvm-version-1: "18"
-      llvm-version-2: "18"
+      llvm-version-2: "20"
   - component: $CI_SERVER_FQDN/$CI_PROJECT_PATH/build-image@$CI_COMMIT_SHA
     inputs:
       platform-version: "48"
       fdsdk-version: "24.08"
       llvm-version-1: "18"
-      llvm-version-2: "18"
+      llvm-version-2: "20"
   - component: $CI_SERVER_FQDN/$CI_PROJECT_PATH/build-image@$CI_COMMIT_SHA
     inputs:
       platform-version: "47"
       fdsdk-version: "24.08"
       llvm-version-1: "18"
-      llvm-version-2: "18"
+      llvm-version-2: "20"
