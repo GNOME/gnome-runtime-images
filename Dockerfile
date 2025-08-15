@@ -31,6 +31,9 @@ RUN dnf upgrade -y --best --allowerasing && \
 RUN which bwrap && which flatpak && which flatpak-builder
 RUN flatpak --version && flatpak-builder --version && bwrap --version
 
+COPY scripts/install-oras.sh /usr/local/bin/scripts/install-oras.sh
+RUN bash /usr/local/bin/scripts/install-oras.sh && rm /usr/local/bin/scripts/install-oras.sh
+
 # generate machine-id as specified in the freedesktop spec:
 # https://www.freedesktop.org/software/systemd/man/machine-id.html
 # for exmaple, gnome-builder test suite depends on this
