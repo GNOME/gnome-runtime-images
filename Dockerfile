@@ -5,10 +5,10 @@ RUN dnf upgrade -y --best --allowerasing && dnf install -y git 'dnf-command(buil
     dnf group install -y development-tools && \
     dnf builddep -y flatpak flatpak-builder
 
-RUN git clone --recursive https://github.com/flatpak/flatpak.git && \
+RUN git clone --recursive --revision 1.16.1 https://github.com/flatpak/flatpak.git && \
     cd flatpak && \
-    git checkout 1.16.1 && \
-    ./autogen.sh && make -j$(nproc) && make install DESTDIR=/flatpak/destdir
+    meson setup --prefix=/usr/local _build && \
+    meson install -C _build --destdir=/flatpak/destdir
 
 RUN git clone --recursive https://github.com/flatpak/flatpak-builder -b barthalion/run-without-fuse-rebased && \
     cd flatpak-builder && \
