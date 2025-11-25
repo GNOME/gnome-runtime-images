@@ -7,7 +7,7 @@ RUN dnf upgrade -y --best --allowerasing && dnf install -y git 'dnf-command(buil
 
 RUN git clone --recursive https://github.com/flatpak/flatpak.git && \
     cd flatpak && \
-    git checkout 1.14.8 && \
+    git checkout 1.16.1 && \
     ./autogen.sh && make -j$(nproc) && make install DESTDIR=/flatpak/destdir
 
 RUN git clone --recursive https://github.com/flatpak/flatpak-builder -b barthalion/run-without-fuse-rebased && \
