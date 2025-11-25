@@ -47,7 +47,7 @@ base:aarch64:
     - gnome-build-meta
   variables:
     ARCH: aarch64
-    DOCKERIMAGE: ${CI_REGISTRY_IMAGE}:${ARCH}-base
+    DOCKERIMAGE: ${CI_REGISTRY_IMAGE}:${ARCH}-base-mr-test
     DOCKERFILE: Dockerfile
 
 base-manifest:

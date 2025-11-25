@@ -11,7 +11,7 @@ LLVM_VERSION_2="$4"
 #
 # Explicitly specify the repo to install nightly and 44,45 runtimes
 # Workaround https://github.com/flathub/flathub/issues/4452
-CONTAINER=$(buildah from "${CI_REGISTRY_IMAGE}:base")
+CONTAINER=$(buildah from "${CI_REGISTRY_IMAGE}:base-mr-test")
 
 export TAG="${CI_REGISTRY_IMAGE}:${ARCH}-gnome-${BRANCH}"
 echo "Building $TAG"
