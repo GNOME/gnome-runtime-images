@@ -32,19 +32,19 @@ else
         "org.gnome.Sdk//${BRANCH}" "org.gnome.Platform//${BRANCH}"
 fi
 
+    # "org.freedesktop.Sdk.Extension.node24//${FD_BRANCH}" \
+    # "org.freedesktop.Sdk.Extension.typescript//${FD_BRANCH}" \
+    # "org.freedesktop.Sdk.Extension.vala//${FD_BRANCH}"
 buildah run "$CONTAINER" flatpak install --user --noninteractive \
     "org.freedesktop.Sdk.Extension.llvm${LLVM_VERSION_2}//${FD_BRANCH}" \
     "org.freedesktop.Sdk.Extension.llvm${LLVM_VERSION}//${FD_BRANCH}" \
-    "org.freedesktop.Sdk.Extension.node24//${FD_BRANCH}" \
-    "org.freedesktop.Sdk.Extension.rust-stable//${FD_BRANCH}" \
-    "org.freedesktop.Sdk.Extension.typescript//${FD_BRANCH}" \
-    "org.freedesktop.Sdk.Extension.vala//${FD_BRANCH}"
+    "org.freedesktop.Sdk.Extension.rust-stable//${FD_BRANCH}"
 
 buildah run "$CONTAINER" flatpak install --user --noninteractive \
     "org.freedesktop.Sdk//${FD_BRANCH}"
 
-buildah run $CONTAINER flatpak install --user --noninteractive \
-    "org.freedesktop.Sdk.Extension.vala-nightly//${FD_BRANCH}"
+# buildah run $CONTAINER flatpak install --user --noninteractive \
+#     "org.freedesktop.Sdk.Extension.vala-nightly//${FD_BRANCH}"
 
 buildah run "$CONTAINER" flatpak info --user "org.gnome.Platform//${BRANCH}"
 buildah run "$CONTAINER" flatpak info --user "org.gnome.Sdk//${BRANCH}"
