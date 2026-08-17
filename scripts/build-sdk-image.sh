@@ -32,13 +32,20 @@ else
         "org.gnome.Sdk//${BRANCH}" "org.gnome.Platform//${BRANCH}"
 fi
 
-    # "org.freedesktop.Sdk.Extension.node24//${FD_BRANCH}" \
-    # "org.freedesktop.Sdk.Extension.typescript//${FD_BRANCH}" \
-    # "org.freedesktop.Sdk.Extension.vala//${FD_BRANCH}"
 buildah run "$CONTAINER" flatpak install --user --noninteractive \
     "org.freedesktop.Sdk.Extension.llvm${LLVM_VERSION_2}//${FD_BRANCH}" \
     "org.freedesktop.Sdk.Extension.llvm${LLVM_VERSION}//${FD_BRANCH}" \
-    "org.freedesktop.Sdk.Extension.rust-stable//${FD_BRANCH}"
+    "org.freedesktop.Sdk.Extension.rust-stable//${FD_BRANCH}" \
+    "org.freedesktop.Sdk.Extension.typescript//${FD_BRANCH}" \
+    "org.freedesktop.Sdk.Extension.vala//${FD_BRANCH}"
+
+if [[ "$FD_BRANCH" == *26.08* ]]; then
+    buildah run "$CONTAINER" flatpak install flathub-beta --user --noninteractive \
+        "org.freedesktop.Sdk.Extension.node26//${FD_BRANCH}"
+else
+    buildah run "$CONTAINER" flatpak install flathub --user --noninteractive \
+        "org.freedesktop.Sdk.Extension.node24//${FD_BRANCH}"
+fi
 
 buildah run "$CONTAINER" flatpak install --user --noninteractive \
     "org.freedesktop.Sdk//${FD_BRANCH}"
