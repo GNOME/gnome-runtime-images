@@ -29,7 +29,6 @@ base:aarch64:
   extends: ".base_template"
   tags:
     - aarch64
-    - gnome-build-meta
   variables:
     ARCH: aarch64
 
